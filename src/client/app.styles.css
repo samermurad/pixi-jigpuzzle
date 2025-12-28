@@ -1,0 +1,29 @@
+:root {
+    --primary: #DB504A;
+    --secondary: #FF6F59;
+    --background-primary: #254441;
+    --background-secondary: #43AA8B;
+    --separator: #B2B09B;
+    --text-light: #EEEEEE;
+    --text-dark: #333333;
+}
+* {
+    font-family: 'Luckiest Guy RUS-BEL-UKR', sans-serif;
+}
+
+body {
+    margin: 0;
+    background-color: var(--background-primary);
+}
+
+#root {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    min-height: 400px;
+    min-width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

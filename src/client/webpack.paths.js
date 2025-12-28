@@ -24,7 +24,7 @@ const paths = {
     nodeModulesDir,
     entry: resolveProjectRelativePath(clientDir, 'index.ts'),
     html: resolveProjectRelativePath(clientDir, 'index.html'),
-    tsConfig: resolveProjectRelativePath(clientDir, 'tsconfig.client.json'),
+    tsConfig: resolveProjectRelativePath(clientDir, 'tsconfig.json'),
 }
 export default paths;
 

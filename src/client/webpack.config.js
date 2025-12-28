@@ -1,75 +1,74 @@
 import HTMLWebpackPlugin from 'html-webpack-plugin';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import paths from './webpack.paths.js';
 
+
+const isDev = process.env.NODE_ENV !== 'production';
+const cssInjectOrExtract = isDev ? 'style-loader' : MiniCssExtractPlugin.loader;
+
+if (isDev) {
+    console.log('WEBPACK DEV MODE (?)')
+}
 const plugins = [
     new CleanWebpackPlugin({
         cleanOnceBeforeBuildPatterns: [paths.clientOutDir],
+    }),
+    new MiniCssExtractPlugin({
+        filename: 'css/[name].css',
+        chunkFilename: 'css/[id].css',
     }),
     new HTMLWebpackPlugin({ template: paths.html }),
 ]
 
 export default {
-    // mode: 'production',
-    mode: 'development',
+    mode: isDev ? 'development' : 'production',
     entry: {
         main: paths.entry
     },
     output: {
         path: paths.clientOutDir,
-        publicPath: '/app',
+        publicPath: '/app/',
         filename: 'main.js',
-        globalObject: 'this',
+        // globalObject: 'this',
     },
     module: {
         rules: [
-            /**
-             * Ts files loader
-             * */
             {
                 oneOf: [
                     {
-                        test: /\.(js|ts)x?$/,
-                        use: [
-                            {
-                                loader: 'ts-loader',
-                                options: {
-                                    configFile: paths.tsConfig,
-                                }
-                            }
-                        ],
+                        test: /\.(ts|tsx)$/,
+                        use: [{ loader: 'ts-loader', options: { configFile: paths.tsConfig } }],
                         exclude: /node_modules/,
-                        include: [
-                            paths.clientDir,
-                            paths.projectSharedDir
-                        ]
-                    }
-                ]
-            },
-            /**
-             * CSS Modules loader
-             * All the *.module.css files
-             * These files are interpreted with local classes,
-             * so definitions are per file
-             */
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
+                        include: [paths.clientDir, paths.projectSharedDir],
+                    },
                     {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 1,
-                            modules: {
-                                mode: 'local',
-                                localIdentName: '[name]_[local]__[hash:base64:5]',
+                        test: /\.module\.css$/,
+                        use: [
+                            cssInjectOrExtract,
+                            {
+                                loader: 'css-loader',
+                                options: {
+                                    esModule: false,          // <-- important for many TS setups
+                                    importLoaders: 1,
+                                    modules: {
+                                        localIdentName: '[local]___[hash:base64:5]',
+                                    },
+                                },
                             },
-                        }
+                        ],
+                    },
+                    {
+                        test: /\.css$/,
+                        exclude: /\.module\.css$/,
+                        use: [
+                            cssInjectOrExtract,
+                            'css-loader',
+                        ],
                     },
                 ],
-                include: /\.module\.css$/
             },
-        ]
+        ],
     },
     resolve: {
         extensions: ['.ts', '.js', '.jsx'],

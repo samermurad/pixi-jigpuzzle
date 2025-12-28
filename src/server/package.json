@@ -6,7 +6,7 @@
     "build": "tsc --project tsconfig.server.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "node ./dist/server/index.js",
-    "watch": "tsc --project tsconfig.server.json --watch"
+    "watch": "tsc --project tsconfig.json --watch"
   },
   "author": "Samer Murad <samermurad555@gmail.com> (https://www.samermurad.com/)",
   "license": "ISC",

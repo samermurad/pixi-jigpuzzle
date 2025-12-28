@@ -18,6 +18,7 @@ app.use('/app', express.static(EnvVars.CLIENT_CODE_LOCATION));
 
 app.listen(EnvVars.PORT, () => {
   console.log(`Server running on port: http://localhost:${EnvVars.PORT}`);
+  console.log(`App is here: http://localhost:${EnvVars.PORT}/app`);
 });
 
 

@@ -1,21 +1,17 @@
-import sharedLib from '../shared';
-import { Card, CardType } from '../shared/models/Card';
+import './app.styles.css'
+import { PixiApp } from './app/PixiApp';
 
+class Main {
+  root: HTMLDivElement;
+  app: PixiApp;
+  constructor(public readonly name: string) {
+    this.root = document.getElementById('root')! as HTMLDivElement;
+    this.root.innerHTML = 'This definitely succeeded';
 
-const clientSideCode = () => console.log('ClientSide Code');
-clientSideCode();
+    this.app = new PixiApp(this.root);
+  }
+}
 
-sharedLib()
-
-
-
-console.log(`${new Card(CardType.CLUBS, 'A')}`)
-
-const cards: Card[] = [
-  new Card(CardType.CLUBS, 'A'),
-]
-
-
-console.log(cards);
-console.log('samer');
-
+document.addEventListener('DOMContentLoaded', () => {
+  (globalThis as any).main = new Main('app');
+})
