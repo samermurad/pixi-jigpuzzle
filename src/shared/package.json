@@ -1,0 +1,16 @@
+{
+  "name": "jig-puzzle-shared",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.shared.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc --project tsconfig.shared.json --watch"
+  },
+  "author": "Samer Murad <samermurad555@gmail.com> (https://www.samermurad.com/)",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

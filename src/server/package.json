@@ -1,0 +1,21 @@
+{
+  "name": "jig-puzzle-server",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.server.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node ./dist/server/index.js",
+    "watch": "tsc --project tsconfig.server.json --watch"
+  },
+  "author": "Samer Murad <samermurad555@gmail.com> (https://www.samermurad.com/)",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}

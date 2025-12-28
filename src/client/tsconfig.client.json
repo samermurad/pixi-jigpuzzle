@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ESNext",         /* Target modern JavaScript for HTML5 support */
+    "lib": ["DOM", "DOM.Iterable", "ESNext"], /* Include browser APIs (Canvas, Storage, etc.) */
+    "module": "ESNext",         /* Use standard ES modules in the output */
+    "moduleResolution": "node", /* Standard way to find modules */
+    "outDir": "../../dist/bundle"
+  },
+  "include": ["../shared", "../client"],
+}

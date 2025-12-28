@@ -1,0 +1,28 @@
+{
+  "name": "jig-puzzle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm run build -ws",
+    "run:client": "node ./dist/client/index.js",
+    "run:server": "node ./dist/server/index.js",
+    "build:watch:client": "npm run watch -w src/client",
+    "build:watch:server": "npm run watch -w src/server",
+    "run:watch:server": "node --watch-path=./dist/ ./dist/server/index.js",
+    "bundle:client": "webpack --config ./src/client/webpack.config.js",
+    "bundle:client:watch": "webpack --config ./src/client/webpack.config.js --watch"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "private": true,
+  "workspaces": [
+    "src/client",
+    "src/server",
+    "src/shared"
+  ]
+}
