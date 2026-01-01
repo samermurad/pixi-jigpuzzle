@@ -15,8 +15,6 @@ export class PixiApp {
   VIRTUAL_WIDTH: number = 350;
   VIRTUAL_HEIGHT: number = 700;
 
-  // DEFAULT_PUZZLE = '/assets/img/'
-
   constructor(public readonly root: HTMLDivElement) {
     this.canvas = document.createElement('canvas');
     const div = document.createElement('div');
