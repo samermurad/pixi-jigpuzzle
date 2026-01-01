@@ -6,6 +6,9 @@
     --separator: #B2B09B;
     --text-light: #EEEEEE;
     --text-dark: #333333;
+
+    --vh: 1vh;
+    --vw: 1vw;
 }
 * {
     font-family: 'Luckiest Guy RUS-BEL-UKR', sans-serif;

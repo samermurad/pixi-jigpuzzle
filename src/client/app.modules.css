@@ -1,0 +1,72 @@
+
+.appButton {
+    position: relative;
+    margin-top: 8px;
+    width: 120px;
+    height: 65px;
+    border-radius: calc(2 * var(--vh, 1vh));
+
+    cursor: pointer;
+    transform-origin: bottom;
+    user-select: none;
+    box-shadow: 0 0.4vh 0 #00000020;
+}
+
+.appButton::before {
+    transition: all 0.2s ease-in-out;
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 10%;
+    background: #dddddd;
+    border-radius: calc(2 * var(--vh, 1vh));
+    z-index: 0;
+    display: block;
+    margin: 0;
+}
+
+.appButton:active {
+    transform: scale(1.1, 0.9);
+    transition-delay: 0s;
+    transition-duration: 0.1s;
+}
+
+.appButton[disabled] {
+        pointer-events: none;
+        filter: contrast(0.5) saturate(0.5);
+        opacity: 0.5;
+}
+
+.appButton span {
+    font-size: 1.3em;
+    position: relative;
+    color: white;
+    z-index: 1;
+}
+
+.shinyAppButton {
+    composes: appButton;
+    --btn-bg-color: #5e5e5e;
+    background: var(--btn-bg-color);
+}
+
+.shinyAppButton::before {
+    --outer-color: #bfbfbf;
+    --inner-color: #ececec;
+    --start-p: 32%;
+    --end-p: calc(var(--start-p) + 23%);
+    bottom: 20%;
+    background:
+            linear-gradient(
+                    65deg,
+                    var(--outer-color) var(--start-p),
+                        /*rgba(255, 63, 20, 0.5) var(--start-p),*/
+                    var(--inner-color) var(--start-p),
+                    var(--inner-color) var(--end-p),
+                    var(--outer-color) var(--end-p)),
+            var(--outer-color)
+
+            no-repeat;
+}

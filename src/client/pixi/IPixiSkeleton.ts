@@ -5,7 +5,6 @@ export interface IPixiSkeleton {
   get active(): boolean;
   set active(value: boolean);
   init(app: Application): Promise<void>;
-  // addToStage(app: Application): Promise<void>
   get graphic(): Container;
   getStageID(): StageIDS | null;
   update?(): void;
@@ -19,6 +18,7 @@ export namespace IPixiSkeleton {
     return makeSkeletonFromPixiObject(pixiObject, stageID, updateMethod);
   }
 }
+
 function makeSkeletonFromPixiObject(
   pixiObject: Container,
   stageID: StageIDS = StageIDS.Main,
@@ -48,7 +48,3 @@ function makeSkeletonFromPixiObject(
   }
   return pixiObj;
 }
-
-// const sprite = new Sprite();
-
-// makeSkeletonFromPixiObject(sprite);

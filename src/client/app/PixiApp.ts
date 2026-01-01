@@ -21,6 +21,10 @@ export class PixiApp {
     div.classList.add(PixiAppStyles.container);
     div.appendChild(this.canvas);
     this.root.appendChild(div);
+    const button = document.createElement('button');
+    button.className = PixiAppStyles.playButton;
+    button.innerHTML = `<span>Play</span>`;
+    this.root.appendChild(button);
   }
 
   private initStages(): void {

@@ -1,4 +1,4 @@
-import { Application, Color, ColorSource, Container, FillInput, Graphics, Sprite, Ticker, ColorMatrixFilter } from 'pixi.js';
+import { Application, Color, ColorSource, Container, Graphics, Sprite } from 'pixi.js';
 import { StageIDS } from '../enums/StageIDS';
 import { IPixiSkeleton } from './IPixiSkeleton';
 import PixiMath from '../../shared/models/PixiMath'
@@ -20,17 +20,7 @@ export class SquareLoader implements IPixiSkeleton {
     this.container.x = x;
     this.container.y = y;
     const color2use = new Color(this.color);
-    // color.toHex();        // "#ff0000"
-    // color.toRgbString();  // "rgb(255,0,0,1)"
-    // color.toNumber();     // 0xff0000
-    console.log(color2use.toHex())
     this.hsb = PixiMath.hexToHsb(color2use.toHex());
-    // console.log(this.hsb);
-    // const col = new ColorMatrixFilter();
-    // col.hue(this.hsb.h, true)
-    // col.saturate(this.hsb.s, true)
-    // col.brightness(this.hsb.b, true)
-    // this.container.filters = [col];
   }
 
 
@@ -68,13 +58,6 @@ export class SquareLoader implements IPixiSkeleton {
             })
         )
 
-    // const col = new ColorMatrixFilter();
-    //   col.hue(this.hsb.h, true)
-    //   col.saturate(this.hsb.s, true)
-    //   col.brightness(this.hsb.b, true)
-    //   console.log(col)
-    //   console.log(`${col}`)
-    //   lines.filters = [col]
       const texture = app.renderer.generateTexture(container);
       this.sprite = new Sprite(texture);
       this.sprite.anchor.set(0.5);
