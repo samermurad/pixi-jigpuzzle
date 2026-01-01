@@ -11,6 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 console.log('ENV', EnvVars);
+app.get('/', (req, res) => {
+  res.redirect(`http://localhost:${process.env.PORT}/app`);
+})
 app.get('/app', (req, res) => {
   res.sendFile(EnvVars.INDEX_HTML);
 })

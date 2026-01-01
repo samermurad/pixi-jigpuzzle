@@ -66,6 +66,10 @@ export default {
                             'css-loader',
                         ],
                     },
+                    {
+                        test: /\.(png|jpg|gif)$/,
+                        type: 'asset/resource',
+                    }
                 ],
             },
         ],

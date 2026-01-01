@@ -6,9 +6,16 @@ class Main {
   app: PixiApp;
   constructor(public readonly name: string) {
     this.root = document.getElementById('root')! as HTMLDivElement;
-    this.root.innerHTML = 'This definitely succeeded';
-
+    // this.root.innerHTML = 'This definitely succeeded';
     this.app = new PixiApp(this.root);
+
+    this.app.setup()
+      .then(() => {
+        console.log('App Setup Done');
+      })
+      .catch((err) => {
+        console.error('App Setup Failed', err);
+      })
   }
 }
 

@@ -7,7 +7,8 @@
     "module": "ESNext",         /* Use standard ES modules in the output */
     "moduleResolution": "node", /* Standard way to find modules */
     "outDir": "../../dist/bundle",
-
+    "noImplicitAny": true,
+    "strict": true
     /* Bundler mode */
 //    "moduleResolution": "bundler",
 //    "allowImportingTsExtensions": true,
