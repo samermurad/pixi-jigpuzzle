@@ -5,7 +5,7 @@ import PixiMath from '../../shared/models/PixiMath'
 
 export class SquareLoader implements IPixiSkeleton {
   private isActive: boolean = true;
-  private container: Container;
+  private readonly container: Container;
   private sprite!: Sprite;
 
   private hsb: { h: number; s: number, b: number };
