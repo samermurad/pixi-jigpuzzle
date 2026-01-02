@@ -12,6 +12,7 @@ import {
 import { Colors } from '../../enums/Colors';
 import { StageIDS } from '../../enums/StageIDS';
 import { Grid } from '../data/Grid';
+import { ImageTile } from './ImageTile';
 import { IPixiSkeleton } from './IPixiSkeleton';
 
 //             5x5
@@ -29,11 +30,35 @@ import { IPixiSkeleton } from './IPixiSkeleton';
 //   20.   21.   22.   23.   24.
 
 
+function shuffleArray(array: number[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function shuffledArray(array: number[]): number[] {
+  let arr = ([] as number[]).concat(array);
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// function shuffledArray(array) {
+//   let arr = ([]).concat(array);
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [arr[i], arr[j]] = [arr[j], arr[i]];
+//   }
+//   return arr;
+// }
 export class ImageGrid implements IPixiSkeleton {
   private readonly container: Container;
   private sheet!: Spritesheet;
   private isActive: boolean = true;
-
+  private tiles: Dict<ImageTile> = {};
 
   constructor(
     public readonly image: Texture,
@@ -50,12 +75,12 @@ export class ImageGrid implements IPixiSkeleton {
   }
 
   private initGrid(): Grid {
-      return new Grid(
-        this.columns,
-        this.rows,
-        this.image.frame,
-        { width: this.width, height: this.height },
-      )
+    return new Grid(
+      this.columns,
+      this.rows,
+      this.image.frame,
+      { width: this.width, height: this.height },
+    )
   }
 
   private grid2SpriteData(grid: Grid): SpritesheetData {
@@ -86,41 +111,76 @@ export class ImageGrid implements IPixiSkeleton {
 
     return data;
   }
-  async initV4(app: Application): Promise<void> {
-      const grid = this.initGrid();
-      const spritesheetData = this.grid2SpriteData(grid);
-      this.sheet = new Spritesheet(this.image.source, spritesheetData);
-      await this.sheet.parse();
-      // console.log('Spritesheet ready to use!');
-      console.log(grid, spritesheetData);
-      for (let index = 0; index < grid.size; index++) {
-          const tile = grid.tileByIndex(index);
-        // const flippedTile = grid.tileIdByIndex((grid.size - 1) - index)
-        const flippedTile = grid.tileIdByIndex(index)
-        // console.log('Spritesheet ready to use!', tile, 'current Index', tile.gridTileID, 'flipped id', flippedTile);
 
-        const sprite = new Sprite(this.sheet.textures[flippedTile]);
-
-        sprite.x = tile.tileX;
-        sprite.y = tile.tileY;
-        sprite.width = tile.tileW;
-        sprite.height = tile.tileH;
-        this.container.addChild(sprite);
-        this.container.addChild(
-          new Graphics()
-            .rect(tile.tileX, tile.tileY, tile.tileW, tile.tileH)
-            .stroke({
-              width: 2,
-              color: Colors.Secondary,
-              alignment: 1,
-            })
-        )
-      }
+  private tileToMove: ImageTile | null = null
+  private initializeMouseMove(): void {
+    this.container.eventMode = 'static'
+    this.container.on('globalpointermove', (event) => {
+        // sprite.position.set(event.global.x, event.global.y);
+        if (this.tileToMove) {
+          this.tileToMove.graphic.position.set(event.global.x, event.global.y);
+        }
+    });
   }
-
+  private initializeTileClicks(tile: ImageTile): void {
+      const pixiObj = tile.graphic;
+      pixiObj.eventMode = 'static';
+      pixiObj.on('pointerdown', () => {
+        // this.minusSprite.alpha = 0.5;
+        // this.minusSprite.scale.set(.9);
+        this.tileToMove = tile;
+      })
+      pixiObj.on('pointerup', (event) => {
+        this.tileToMove = null;
+        tile.resetPosition()
+      // this.minusSprite.alpha = 1;
+      // this.minusSprite.scale.set(1);
+      // this.onSpriteClicked(event, 'minus');
+    })
+    pixiObj.on('pointerupoutside', (event) => {
+      this.tileToMove = null;
+      tile.resetPosition()
+      // this.minusSprite.alpha = 1;
+      // this.minusSprite.scale.set(1);
+      // this.onSpriteClicked(event, 'minus');
+    })
+  }
   async init(app: Application): Promise<void> {
-    return this.initV4(app)
+    const grid = this.initGrid();
+    const spritesheetData = this.grid2SpriteData(grid);
+    this.sheet = new Spritesheet(this.image.source, spritesheetData);
+    await this.sheet.parse();
+    // console.log('Spritesheet ready to use!');
+    console.log(grid, spritesheetData);
+
+    this.initializeMouseMove();
+
+    const shuffledIds =
+      shuffledArray(
+        Array(grid.size).fill(0).map((_, index)=> index)
+      )
+
+    for (let index = 0; index < grid.size; index++) {
+      const tile = grid.tileByIndex(index);
+      // const flippedTile = grid.tileIdByIndex(index)
+      const imgTile = new ImageTile(
+        grid,
+        this.sheet,
+        index,
+        shuffledIds[index], // should be randomized
+      )
+      this.tiles[tile.gridTileID] = imgTile;
+      await imgTile.init(app);
+      this.container.addChild(
+        imgTile.graphic
+      )
+      this.initializeTileClicks(imgTile);
+    }
   }
+
+  // async init(app: Application): Promise<void> {
+  //   return this.initV4(app)
+  // }
 
   set active(active: boolean) {
     this.isActive = active;

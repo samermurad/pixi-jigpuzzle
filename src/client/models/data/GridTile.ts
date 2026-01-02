@@ -1,3 +1,9 @@
+
+export type GridTileIdData =  {
+  index: number;
+  col: number;
+  row: number;
+}
 export class GridTile {
   constructor(
     public readonly index: number,
