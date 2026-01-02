@@ -1,5 +1,4 @@
 import { Size, Rectangle, Point, Dict } from 'pixi.js';
-import { GridData } from './GridData';
 import { GridTile } from './GridTile';
 
 
