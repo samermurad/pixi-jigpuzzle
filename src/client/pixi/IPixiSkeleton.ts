@@ -1,17 +1,17 @@
 import { Application, Container, Sprite } from 'pixi.js';
 import { StageIDS } from '../enums/StageIDS';
 
-export interface IPixiSkeleton {
+export interface IPixiSkeleton<T extends Container = Container> {
   get active(): boolean;
   set active(value: boolean);
   init(app: Application): Promise<void>;
-  get graphic(): Container;
+  get graphic(): T;
   getStageID(): StageIDS | null;
   update?(): void;
 }
 
 export namespace IPixiSkeleton {
-  export function fromPixiObject(pixiObject: Container,
+  export function fromPixiObject<T extends Container = Container>(pixiObject: T,
                                  stageID: StageIDS = StageIDS.Main,
                                  updateMethod: (() => void) | null = null) {
 
@@ -19,15 +19,14 @@ export namespace IPixiSkeleton {
   }
 }
 
-function makeSkeletonFromPixiObject(
-  pixiObject: Container,
+function makeSkeletonFromPixiObject<T extends Container = Container>(
+  pixiObject: T,
   stageID: StageIDS = StageIDS.Main,
   updateMethod: (() => void) | null = null
-): IPixiSkeleton {
-  class PixiSkeletonClass implements IPixiSkeleton {
+): IPixiSkeleton<T> {
+  class PixiSkeletonClass implements IPixiSkeleton<T> {
     private isActive: boolean = true;
-    // update: OmitThisParameter<() => void>;
-    constructor(private readonly container: Container) {}
+    constructor(private readonly container: T) {}
     getStageID(): StageIDS | null { return stageID; }
     async init(app: Application): Promise<void> {
       /* noop */
@@ -37,7 +36,7 @@ function makeSkeletonFromPixiObject(
       this.container.visible = this.isActive;
     }
     get active(): boolean { return this.isActive; }
-    get graphic(): Container {
+    get graphic(): T {
       return this.container;
     }
   }

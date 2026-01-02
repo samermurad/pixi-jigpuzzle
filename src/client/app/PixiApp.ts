@@ -1,5 +1,6 @@
 import { Colors } from '../enums/Colors';
 import { StageIDS } from '../enums/StageIDS';
+import { ImageGrid } from '../pixi/ImageGrid';
 import { IPixiSkeleton } from '../pixi/IPixiSkeleton';
 import { SquareLoader } from '../pixi/SquareLoader';
 import PixiAppStyles from './PixiApp.module.css';
@@ -62,16 +63,16 @@ export class PixiApp {
       () => this.update()
     )
 
-    const size = 65;
-    const loader = new SquareLoader(
-      vw  / 2 - size / 4,
-      vh / 2 - size / 4,
-      size,
-      Colors.Primary
-    );
-    await loader.init(this.app);
-    this.addToStage(loader);
-    let sprite = IPixiSkeleton.fromPixiObject(
+    // const size = 65;
+    // const loader = new SquareLoader(
+    //   vw  / 2 - size / 4,
+    //   vh / 2 - size / 4,
+    //   size,
+    //   Colors.Primary
+    // );
+    // await loader.init(this.app);
+    // this.addToStage(loader);
+    let sprite = IPixiSkeleton.fromPixiObject<Sprite>(
       new Sprite(
         await Assets.load(DefaultWallpaper)
       )
@@ -79,7 +80,11 @@ export class PixiApp {
     sprite.graphic.width = this.VIRTUAL_WIDTH;
     sprite.graphic.height = this.VIRTUAL_HEIGHT;
 
-    this.addToStage(sprite);
+    // this.addToStage(sprite);
+
+    const imgGrid = new ImageGrid(sprite.graphic.texture, 0, 0, this.VIRTUAL_WIDTH, this.VIRTUAL_HEIGHT, 5, 5);
+    await imgGrid.init(this.app);
+    this.addToStage(imgGrid);
   }
 
   public update() {
