@@ -1,5 +1,5 @@
 import { Application, Container, Sprite } from 'pixi.js';
-import { StageIDS } from '../enums/StageIDS';
+import { StageIDS } from '../../enums/StageIDS';
 
 export interface IPixiSkeleton<T extends Container = Container> {
   get active(): boolean;

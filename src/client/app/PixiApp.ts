@@ -1,8 +1,8 @@
 import { Colors } from '../enums/Colors';
 import { StageIDS } from '../enums/StageIDS';
-import { ImageGrid } from '../pixi/ImageGrid';
-import { IPixiSkeleton } from '../pixi/IPixiSkeleton';
-import { SquareLoader } from '../pixi/SquareLoader';
+import { ImageGrid } from '../models/pixi/ImageGrid';
+import { IPixiSkeleton } from '../models/pixi/IPixiSkeleton';
+import { SquareLoader } from '../models/pixi/SquareLoader';
 import PixiAppStyles from './PixiApp.module.css';
 import { Application, Assets, Container, Sprite } from 'pixi.js';
 import DefaultWallpaper from '../assets/img/ExamplePuzzle.jpg'

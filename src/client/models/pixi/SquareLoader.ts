@@ -1,7 +1,7 @@
 import { Application, Color, ColorSource, Container, Graphics, Sprite } from 'pixi.js';
-import { StageIDS } from '../enums/StageIDS';
+import { StageIDS } from '../../enums/StageIDS';
 import { IPixiSkeleton } from './IPixiSkeleton';
-import PixiMath from '../../shared/models/PixiMath'
+import PixiMath from '../../../shared/models/PixiMath'
 
 export class SquareLoader implements IPixiSkeleton {
   private isActive: boolean = true;
