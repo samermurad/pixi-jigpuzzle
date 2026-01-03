@@ -7,6 +7,10 @@ type EnvVarsType = {
   CLIENT_CODE_LOCATION: string;
   SHARED_CODE_LOCATION: string;
   INDEX_HTML: string;
+  UNSPLASH_APP_ID: string;
+  UNSPLASH_APP_KEY: string;
+  UNSPLASH_SECRET_KEY: string;
+
 }
 const config = dotenv.config({ path: ".env.server" })
 

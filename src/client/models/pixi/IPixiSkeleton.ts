@@ -8,6 +8,8 @@ export interface IPixiSkeleton<T extends Container = Container> {
   get graphic(): T;
   getStageID(): StageIDS | null;
   update?(): void;
+
+  destroy?(): void;
 }
 
 export namespace IPixiSkeleton {

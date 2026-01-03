@@ -210,20 +210,20 @@ export class ImageGrid implements IPixiSkeleton {
     this.container.sortChildren();
     // const fromCoords =
     const coords = this.grid.nearestGridTile(pos)
-    void this.toast(
-      tile.locTile.gridHumanTileID
-      + ' to: ' +
-      coords.gridHumanTileID
-    )
+    // void this.toast(
+    //   tile.locTile.gridHumanTileID
+    //   + ' to: ' +
+    //   coords.gridHumanTileID
+    // )
 
-    // if (coords.gridTileID == tile.locTile.gridTileID) {
-    //   console.log('No need to do shite')
-    // } else {
+    if (coords.gridTileID == tile.locTile.gridTileID) {
+      console.log('No need to do shite')
+    } else {
       void this.reorderTiles(
         { row: tile.locTile.row, col: tile.locTile.col },
         { row: coords.row, col: coords.col },
       )
-    // }
+    }
 
   }
 
@@ -316,6 +316,10 @@ export class ImageGrid implements IPixiSkeleton {
 
     if (tileF == null || tileT == null) {
       console.error('Tile ids not found');
+      return;
+    }
+    if (tileF.locTile.index == tileT.locTile.index) {
+      console.error('no need to move');
       return;
     }
 

@@ -48,8 +48,8 @@ export class ImageTile implements IPixiSkeleton {
         alignment: 1,
       })
     this.container.addChild(this.sprite);
-    this.container.addChild(this.texLabel);
-    this.container.addChild(this.locLabel);
+    // this.container.addChild(this.texLabel);
+    // this.container.addChild(this.locLabel);
     this.container.addChild(this.border)
     this.prepareLayout();
   }
