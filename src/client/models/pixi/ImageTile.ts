@@ -17,6 +17,8 @@ export class ImageTile implements IPixiSkeleton {
 
   public texTile!: GridTile;
   public locTile!: GridTile;
+
+  public border!: Graphics;
   // private sprite!: Sprite;
 
   constructor(
@@ -38,19 +40,17 @@ export class ImageTile implements IPixiSkeleton {
     this.sprite = new Sprite();
     this.texLabel = new Text({ style: DefaultTextStyle,  text: '' })
     this.locLabel = new Text({ style: DefaultTextStyle,  text: '' })
-
+    this.border = new Graphics()
+      .rect(0, 0, locTile.tileW, locTile.tileH)
+      .stroke({
+        width: 1,
+        color: Colors.Separator,
+        alignment: 1,
+      })
     this.container.addChild(this.sprite);
     this.container.addChild(this.texLabel);
     this.container.addChild(this.locLabel);
-    this.container.addChild(
-      new Graphics()
-        .rect(0, 0, locTile.tileW, locTile.tileH)
-        .stroke({
-          width: 1,
-          color: Colors.Separator,
-          alignment: 1,
-        })
-    )
+    this.container.addChild(this.border)
     this.prepareLayout();
   }
 
@@ -62,6 +62,7 @@ export class ImageTile implements IPixiSkeleton {
     const texTile = this.texTile;
     const locTile = this.locTile;
 
+    const isOnRightSpot = texTile.gridTileID === locTile.gridTileID;
 
     this.container.x = locTile.tileX;
     this.container.y = locTile.tileY;
@@ -77,6 +78,10 @@ export class ImageTile implements IPixiSkeleton {
     this.texLabel.y = this.container.height / 2;
 
     this.locLabel.text = locTile.gridHumanTileID;
+
+    this.border.visible = !isOnRightSpot;
+    this.locLabel.visible = !isOnRightSpot;
+    this.texLabel.visible = !isOnRightSpot;
   }
   getStageID(): StageIDS | null {
     return null;

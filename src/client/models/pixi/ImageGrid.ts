@@ -12,7 +12,8 @@ import {
 import PixiMath from '../../../shared/models/PixiMath';
 import { Colors } from '../../enums/Colors';
 import { StageIDS } from '../../enums/StageIDS';
-import { Grid } from '../data/Grid';
+import { Grid, GridTileCoords } from '../data/Grid';
+import { GridTile } from '../data/GridTile';
 import { Vector2 } from '../data/Vector2';
 import DefaultTextStyle from './DefaultTextStyle';
 import { ImageTile } from './ImageTile';
@@ -214,6 +215,16 @@ export class ImageGrid implements IPixiSkeleton {
       + ' to: ' +
       coords.gridHumanTileID
     )
+
+    // if (coords.gridTileID == tile.locTile.gridTileID) {
+    //   console.log('No need to do shite')
+    // } else {
+      void this.reorderTiles(
+        { row: tile.locTile.row, col: tile.locTile.col },
+        { row: coords.row, col: coords.col },
+      )
+    // }
+
   }
 
   pickUpTile(tile: ImageTile, event: FederatedPointerEvent): void {
@@ -283,4 +294,37 @@ export class ImageGrid implements IPixiSkeleton {
       )
   }
   // endregion
+
+  public async reorderTiles(from: GridTileCoords, to: GridTileCoords): Promise<void> {
+
+    const [fromT, toT] = this.grid.shiftTiles(from, to);
+
+    // const tileF = this.tiles[fromT.gridTileID];
+    // const tileT = this.tiles[fromT.gridTileID];
+
+    let tileF: ImageTile | null = null;
+    let tileT: ImageTile | null = null;
+    for (let i = 0; i < this.grid.size && (tileF == null || tileT == null); i++) {
+      const id = this.grid.tileIdByIndex(i);
+      const tile = this.tiles[id];
+      if (tile.locTile.index == fromT.index) {
+       tileF = tile;
+      } else if (tile.locTile.index == toT.index) {
+        tileT = tile;
+      }
+    }
+
+    if (tileF == null || tileT == null) {
+      console.error('Tile ids not found');
+      return;
+    }
+
+    tileF.setupLocationIndex(toT.index);
+    tileT.setupLocationIndex(fromT.index);
+    // for (const tileShift of shifts) {
+    //   console.log(tileShift.fromId, 'to', tileShift.toId);
+    //   const tile = this.tiles[tileShift.fromId];
+    //   tile.setupLocationIndex(tileShift.toIndex)
+    // }
+  }
 }
