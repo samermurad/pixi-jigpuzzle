@@ -32,7 +32,7 @@ const plugins = [
         template: paths.html,
         templateParameters: {
             // auto reload website in dev mode
-            livereload: (isDev ? `<script src='http://localhost:${LIVE_RELOAD_PORT}/livereload.js'></script>` : ''),
+            livereload: (isDev ? `<script src="http://localhost:${LIVE_RELOAD_PORT}/livereload.js"></script>` : ''),
         }
     })
 ]

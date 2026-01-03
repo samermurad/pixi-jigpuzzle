@@ -7,11 +7,12 @@ import {
   Graphics,
   Color,
   SpritesheetData,
-  Dict, Sprite
+  Dict, Sprite, PointData, FederatedPointerEvent
 } from 'pixi.js';
 import { Colors } from '../../enums/Colors';
 import { StageIDS } from '../../enums/StageIDS';
 import { Grid } from '../data/Grid';
+import { Vector2 } from '../data/Vector2';
 import { ImageTile } from './ImageTile';
 import { IPixiSkeleton } from './IPixiSkeleton';
 
@@ -46,14 +47,6 @@ function shuffledArray(array: number[]): number[] {
   return arr;
 }
 
-// function shuffledArray(array) {
-//   let arr = ([]).concat(array);
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [arr[i], arr[j]] = [arr[j], arr[i]];
-//   }
-//   return arr;
-// }
 export class ImageGrid implements IPixiSkeleton {
   private readonly container: Container;
   private sheet!: Spritesheet;
@@ -70,6 +63,7 @@ export class ImageGrid implements IPixiSkeleton {
     public readonly rows: number,
   ) {
     this.container = new Container();
+    this.container.sortableChildren = true;
     this.container.x = x;
     this.container.y = y;
   }
@@ -112,39 +106,32 @@ export class ImageGrid implements IPixiSkeleton {
     return data;
   }
 
-  private tileToMove: ImageTile | null = null
+  private tileToMoveData: {
+    tile: ImageTile | null,
+    initialOffset: Vector2,
+  } = {
+    tile: null,
+    initialOffset: Vector2.ZERO,
+  }
   private initializeMouseMove(): void {
     this.container.eventMode = 'static'
     this.container.on('globalpointermove', (event) => {
         // sprite.position.set(event.global.x, event.global.y);
-        if (this.tileToMove) {
-          this.tileToMove.graphic.position.set(event.global.x, event.global.y);
+        if (this.tileToMoveData.tile) {
+          const {tile, initialOffset} = this.tileToMoveData;
+          const [x, y] = initialOffset.sum(event.global).toArray()
+          tile.graphic.position.set(x, y);
         }
     });
   }
   private initializeTileClicks(tile: ImageTile): void {
       const pixiObj = tile.graphic;
       pixiObj.eventMode = 'static';
-      pixiObj.on('pointerdown', () => {
-        // this.minusSprite.alpha = 0.5;
-        // this.minusSprite.scale.set(.9);
-        this.tileToMove = tile;
-      })
-      pixiObj.on('pointerup', (event) => {
-        this.tileToMove = null;
-        tile.resetPosition()
-      // this.minusSprite.alpha = 1;
-      // this.minusSprite.scale.set(1);
-      // this.onSpriteClicked(event, 'minus');
-    })
-    pixiObj.on('pointerupoutside', (event) => {
-      this.tileToMove = null;
-      tile.resetPosition()
-      // this.minusSprite.alpha = 1;
-      // this.minusSprite.scale.set(1);
-      // this.onSpriteClicked(event, 'minus');
-    })
+      pixiObj.on('pointerdown', (event) => this.pickUpTile(tile, event));
+      pixiObj.on('pointerup', (event) => this.releaseTile())
+      pixiObj.on('pointerupoutside', (event) => this.releaseTile())
   }
+
   async init(app: Application): Promise<void> {
     const grid = this.initGrid();
     const spritesheetData = this.grid2SpriteData(grid);
@@ -171,9 +158,11 @@ export class ImageGrid implements IPixiSkeleton {
       )
       this.tiles[tile.gridTileID] = imgTile;
       await imgTile.init(app);
+      imgTile.graphic.zIndex = 0;
       this.container.addChild(
         imgTile.graphic
       )
+
       this.initializeTileClicks(imgTile);
     }
   }
@@ -196,4 +185,29 @@ export class ImageGrid implements IPixiSkeleton {
   getStageID(): StageIDS | null {
     return StageIDS.Main;
   }
+
+  // region handle TileMovement
+  releaseTile(): void {
+    const { tile } = this.tileToMoveData
+    if (!tile) return
+    this.tileToMoveData.tile = null;
+    tile.resetPosition()
+    tile.graphic.zIndex = 0;
+    this.container.sortChildren();
+  }
+
+  pickUpTile(tile: ImageTile, event: FederatedPointerEvent): void {
+    this.tileToMoveData.tile = tile;
+    // get offset
+    const offset = tile.graphic.toGlobal({ x: 0, y: 0 });
+    this.tileToMoveData.initialOffset = Vector2
+      .fromObject(offset)
+      .sub(
+        Vector2.fromArray([event.global.x,event.global.y])
+      )
+    // sort child above rest
+    tile.graphic.zIndex = 1;
+    this.container.sortChildren();
+  }
+  // endregion
 }
