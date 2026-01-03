@@ -24,7 +24,7 @@ export type ShiftedTile = {
   toId: string;
 };
 
-export class Grid {
+export class Grid implements Iterable<GridTile> {
   private _size!: number;
   // display space
   public readonly tileW: number;
@@ -210,5 +210,25 @@ export class Grid {
     const tileFrom = this.tileByIndex(fromIndex);
     const tileTo = this.tileByIndex(toIndex);
     return [tileFrom, tileTo];
+  }
+
+  [Symbol.iterator](): Iterator<GridTile> {
+      let currentIndex = 0;
+      const size = this.size;
+      const tileByIndex = this.tileByIndex.bind(this);
+      return {
+        next(): IteratorResult<GridTile> {
+            if (currentIndex < size) {
+              const nextData = currentIndex++
+              return {
+                value: tileByIndex(nextData),
+                done: false,
+              }
+            } else {
+              return { done: true, value: undefined };
+            }
+        }
+
+      }
   }
 }

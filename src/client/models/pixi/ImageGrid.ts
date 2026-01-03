@@ -57,8 +57,18 @@ export class ImageGrid implements IPixiSkeleton {
   private grid!: Grid;
   private isActive: boolean = true;
   private tiles: Dict<ImageTile> = {};
-
   private _weakApp!: WeakRef<Application>;
+  private _isGridSolved: boolean = false;
+
+  private interactionEnabled: boolean = true;
+
+  private tileToMoveData: {
+    tile: ImageTile | null,
+    initialOffset: Vector2,
+  } = {
+    tile: null,
+    initialOffset: Vector2.ZERO,
+  }
 
   constructor(
     public readonly image: Texture,
@@ -75,6 +85,13 @@ export class ImageGrid implements IPixiSkeleton {
     this.container.y = y;
   }
 
+  public setInteractionEnabled(enabled: boolean): void {
+    this.interactionEnabled = enabled;
+  }
+
+  public getInteractionEnabled(): boolean {
+    return this.interactionEnabled;
+  }
   private initGrid(): Grid {
     return new Grid(
       this.columns,
@@ -96,10 +113,9 @@ export class ImageGrid implements IPixiSkeleton {
       animations: {},
     };
 
-    for (let index = 0; index < grid.size; index++) {
-      const gridData = grid.tileByIndex(index);
-      const frameName = gridData.gridTileID;
-      const rect = gridData.frameRect;
+    for (const tile of grid) {
+      const frameName = tile.gridTileID;
+      const rect = tile.frameRect;
       data.frames![frameName] = {
         frame: {...rect},
         rotated: false,
@@ -107,22 +123,15 @@ export class ImageGrid implements IPixiSkeleton {
         spriteSourceSize: {...rect, x: 0, y: 0},
         sourceSize: {...rect},
       }
-      data.animations![gridData.gridTileID] = [frameName];
+      data.animations![tile.gridTileID] = [frameName];
     }
-
     return data;
   }
 
-  private tileToMoveData: {
-    tile: ImageTile | null,
-    initialOffset: Vector2,
-  } = {
-    tile: null,
-    initialOffset: Vector2.ZERO,
-  }
   private initializeMouseMove(): void {
     this.container.eventMode = 'static'
     this.container.on('globalpointermove', (event) => {
+      if (!this.interactionEnabled) return;
         // sprite.position.set(event.global.x, event.global.y);
         if (this.tileToMoveData.tile) {
           const {tile, initialOffset} = this.tileToMoveData;
@@ -197,9 +206,11 @@ export class ImageGrid implements IPixiSkeleton {
 
   // region handle TileMovement
   releaseTile(): void {
-    console.log('releaseTile')
+    if (!this.interactionEnabled) return;
+
     const { tile } = this.tileToMoveData
     if (!tile) return
+    // console.log('releaseTile', tile);
     this.tileToMoveData.tile = null;
     const pos = Vector2.fromArray([
       tile.graphic.x,
@@ -215,19 +226,25 @@ export class ImageGrid implements IPixiSkeleton {
     //   + ' to: ' +
     //   coords.gridHumanTileID
     // )
-
+      // @ts-ignore
+      navigator.vibrate?.([40, 100]);
     if (coords.gridTileID == tile.locTile.gridTileID) {
-      console.log('No need to do shite')
+      // console.log('No need to do shite', tile)
     } else {
       void this.reorderTiles(
         { row: tile.locTile.row, col: tile.locTile.col },
         { row: coords.row, col: coords.col },
-      )
+      ).then(
+        () => this.syncIsGameSolved()
+      );
     }
 
   }
 
   pickUpTile(tile: ImageTile, event: FederatedPointerEvent): void {
+    if (!this.interactionEnabled) return;
+    // console.log('pickUpTile', tile, event);
+    if (this.tileToMoveData.tile) return;
     this.tileToMoveData.tile = tile;
     // get offset
     const offset = tile.graphic.toGlobal({ x: 0, y: 0 });
@@ -243,10 +260,14 @@ export class ImageGrid implements IPixiSkeleton {
   // endregion
 
   // region screen toasting
-  public async toast(text: string): Promise<void> {
+  toastEl!: Text | null;
+  public async toast(text: string, isPermanent: boolean = false): Promise<void> {
       const app = this._weakApp.deref();
       if (!app) return;
-
+      if (this.toastEl) {
+        this.container.removeChild(this.toastEl);
+        this.toastEl = null;
+      }
       const midOfScreen = new Vector2(
         this.container.width / 2,
         this.container.height / 2,
@@ -267,7 +288,7 @@ export class ImageGrid implements IPixiSkeleton {
       this.container.addChild(textToPop);
 
       console.log(text);
-      await (
+      const animator=
         new PixiStageAnimator()
           .addStage('Appear', null, (_, data)=> {
             data.life += 0.06;
@@ -277,40 +298,44 @@ export class ImageGrid implements IPixiSkeleton {
             textToPop.alpha = PixiMath.lerp(0, 1, data.life)
             return data.life >= 1;
           })
-          .addStage('Stay', null, (_, data)=> (data.life += 0.06) >= 4)
-          .addStage('Disappear', null, (_, data)=> {
-            data.life += 0.06;
-            const { x, y } = Vector2.lerp(midOfScreen, upwards, data.life);
-            textToPop.x = x;
-            textToPop.y = y;
-            textToPop.alpha = PixiMath.lerp(1, 0, data.life)
-            return data.life >= 1;
-          })
-          .addStage('remove', null, () => {
-            this.container.removeChild(textToPop);
-            return true;
-          })
-          .run(app.ticker)
-      )
+          if (!isPermanent) {
+          animator
+            .addStage('Stay', null, (_, data)=> (data.life += 0.06) >= 4)
+            .addStage('Disappear', null, (_, data) => {
+              data.life += 0.06;
+              const {x, y} = Vector2.lerp(midOfScreen, upwards, data.life);
+              textToPop.x = x;
+              textToPop.y = y;
+              textToPop.alpha = PixiMath.lerp(1, 0, data.life)
+              return data.life >= 1;
+            })
+              .addStage('remove', null, () => {
+                this.container.removeChild(textToPop);
+                return true;
+              })
+          } else {
+            this.toastEl = textToPop;
+          }
+      await animator.run(app.ticker)
   }
   // endregion
 
   public async reorderTiles(from: GridTileCoords, to: GridTileCoords): Promise<void> {
-
     const [fromT, toT] = this.grid.shiftTiles(from, to);
-
     // const tileF = this.tiles[fromT.gridTileID];
     // const tileT = this.tiles[fromT.gridTileID];
-
     let tileF: ImageTile | null = null;
     let tileT: ImageTile | null = null;
-    for (let i = 0; i < this.grid.size && (tileF == null || tileT == null); i++) {
-      const id = this.grid.tileIdByIndex(i);
-      const tile = this.tiles[id];
-      if (tile.locTile.index == fromT.index) {
-       tileF = tile;
-      } else if (tile.locTile.index == toT.index) {
-        tileT = tile;
+    for (const tile of this.grid) {
+      // got both, exit loop
+      if (tileF != null && tileT != null) break;
+
+      const id = tile.id
+      const imgTile = this.tiles[id];
+      if (imgTile.locTile.index == fromT.index) {
+        tileF = imgTile;
+      } else if (imgTile.locTile.index == toT.index) {
+        tileT = imgTile;
       }
     }
 
@@ -323,6 +348,7 @@ export class ImageGrid implements IPixiSkeleton {
       return;
     }
 
+    // TODO: Maybe animate (?)
     tileF.setupLocationIndex(toT.index);
     tileT.setupLocationIndex(fromT.index);
     // for (const tileShift of shifts) {
@@ -330,5 +356,28 @@ export class ImageGrid implements IPixiSkeleton {
     //   const tile = this.tiles[tileShift.fromId];
     //   tile.setupLocationIndex(tileShift.toIndex)
     // }
+  }
+
+  // region Game Solver
+  private async syncIsGameSolved(): Promise<void> {
+    let didSolve = true;
+    for (const tile of this.grid) {
+        didSolve &&= this.tiles[tile.id].isTileOnRightSpot();
+    }
+
+    if (didSolve) this.setIsGameSolved(didSolve);
+  }
+
+  private setIsGameSolved(isSolved: boolean): void {
+    this._isGridSolved = isSolved;
+  }
+
+  get isGameSolved(): boolean {
+    return this._isGridSolved
+  }
+  // endregion
+
+  destroy(): void {
+    this.container.destroy({ children: true, context: true })
   }
 }

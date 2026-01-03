@@ -29,6 +29,11 @@ export class GridTile {
     return `${this.row}x${this.col}`;
   }
 
+  // convenience
+  get id(): string {
+    return this.gridTileID;
+  }
+
   get gridHumanTileID(): string {
     return `${this.row+1}x${this.col+1}`;
   }

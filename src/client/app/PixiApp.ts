@@ -14,6 +14,8 @@ export class PixiApp {
   stages: Record<StageIDS, Container> = {} as Record<StageIDS, Container>;
   updateAble: IPixiSkeleton[] = []
 
+  private imageGrid!: ImageGrid;
+
   VIRTUAL_WIDTH: number = 350;
   VIRTUAL_HEIGHT: number = 600;
 
@@ -25,8 +27,8 @@ export class PixiApp {
     this.root.appendChild(div);
     const button = document.createElement('button');
     button.className = PixiAppStyles.playButton;
-    button.innerHTML = `<span>Play</span>`;
-    button.onclick = () => {this.confettiAnim(200)}
+    button.innerHTML = `<span>Reset</span>`;
+    button.onclick = () => {this.reset()}
     div.appendChild(button);
   }
 
@@ -61,9 +63,6 @@ export class PixiApp {
     });
 
     this.initStages();
-    this.app.ticker.add(
-      () => this.update()
-    )
     this.setupConfettiLoop();
 
 
@@ -93,35 +92,35 @@ export class PixiApp {
 
     extensions.add(unsplashImageLoading)
 
-    const res = await axios.get(`/api/public/imgs/random/${this.VIRTUAL_WIDTH}/${this.VIRTUAL_HEIGHT}`);
-    // @ts-ignore
-    const { url } = res.data;
-    const img = await Assets.load({
-      src: url,
-      format: 'jpeg',
-    })
-    let sprite = IPixiSkeleton.fromPixiObject<Sprite>(
-      new Sprite(img)
-    );
-    sprite.graphic.width = this.VIRTUAL_WIDTH;
-    sprite.graphic.height = this.VIRTUAL_HEIGHT;
+    await this.startGame(3, 3)
 
-    // this.addToStage(sprite);
-
-    const imgGrid = new ImageGrid(sprite.graphic.texture, 0, 0, this.VIRTUAL_WIDTH, this.VIRTUAL_HEIGHT, 3, 3);
-    await imgGrid.init(this.app);
-    this.addToStage(imgGrid);
+    this.app.ticker.add(
+      () => this.update()
+    )
   }
 
-  startGame(columns: number, rows: number): void {
+  async startGame(columns: number, rows: number): Promise<void> {
+    const img = await this.loadImg()
+    const imgGrid = new ImageGrid(img, 0, 0, this.VIRTUAL_WIDTH, this.VIRTUAL_HEIGHT, columns, rows);
+    await imgGrid.init(this.app);
+    this.imageGrid = imgGrid;
+    this.addToStage(imgGrid);
   }
 
   cleanUp(): void {
 
   }
 
+  async reset(): Promise<void> {
+      this.imageGrid.graphic.parent?.removeChild(this.imageGrid.graphic)
+      // @ts-ignore
+      this.imageGrid = null;
+      await this.startGame(3, 3);
+  }
+
   colors = [0xff3b3b, 0xffd93b, 0x3bff6f, 0x3bb7ff, 0xb83bff];
   confetti: Graphics[] = [];
+
   public setupConfettiLoop(): void {
     this.app.ticker.add((ticker) => {
       for (let i = this.confetti.length - 1; i >= 0; i--) {
@@ -179,6 +178,10 @@ export class PixiApp {
 
   public async loadImg(): Promise<Texture> {
     const res = await axios.get(`/api/public/imgs/random/${this.VIRTUAL_WIDTH}/${this.VIRTUAL_HEIGHT}`);
+
+    if (res.data == null) {
+      return await Assets.load(DefaultWallpaper);
+    }
     // @ts-ignore
     const { url } = res.data;
     return await Assets.load({ src: url, format: 'jpeg' });
@@ -186,6 +189,16 @@ export class PixiApp {
   public update() {
     for (const updates of this.updateAble) {
       if (updates.update) updates.update();
+    }
+
+    if (this.imageGrid) {
+      if (this.imageGrid.isGameSolved) {
+        if (this.imageGrid.getInteractionEnabled()) {
+          this.imageGrid.setInteractionEnabled(false);
+          this.confettiAnim(240)
+          this.imageGrid.toast(["Amazing!", "Good Job!", "Well done!!", "YUUUUUUUUHUUUU"][Math.floor(Math.random() * 4)], true);
+        }
+      }
     }
   }
 }

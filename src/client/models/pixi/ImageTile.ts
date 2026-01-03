@@ -27,7 +27,6 @@ export class ImageTile implements IPixiSkeleton {
     private readonly texIndex: number, // the index of the tex data for the tile
     private readonly initLocIndex: number
   ) {
-
     this.container = new Container();
   }
 
@@ -62,7 +61,7 @@ export class ImageTile implements IPixiSkeleton {
     const texTile = this.texTile;
     const locTile = this.locTile;
 
-    const isOnRightSpot = texTile.gridTileID === locTile.gridTileID;
+    const isOnRightSpot = this.isTileOnRightSpot()
 
     this.container.x = locTile.tileX;
     this.container.y = locTile.tileY;
@@ -86,13 +85,17 @@ export class ImageTile implements IPixiSkeleton {
   getStageID(): StageIDS | null {
     return null;
   }
-
+  public isTileOnRightSpot(): boolean {
+    const texTile = this.texTile;
+    const locTile = this.locTile;
+    return texTile.gridTileID === locTile.gridTileID;
+  }
   get graphic(): Container {
     return this.container;
   }
 
   public resetPosition(): void {
-    const locTile = this.grid.tileByIndex(this.initLocIndex);
+    const locTile = this.locTile;
     this.container.x = locTile.tileX;
     this.container.y = locTile.tileY;
   }

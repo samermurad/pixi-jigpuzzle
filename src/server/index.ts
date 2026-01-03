@@ -22,7 +22,8 @@ async function initApp(): Promise<Express> {
   await mainRouter(app);
 
   app.get('/', (req, res) => {
-    res.redirect(`http://localhost:${process.env.PORT}/app`);
+    res.redirect(`/app`);
+  //   http://localhost:${process.env.PORT}
   })
 
   return app;
