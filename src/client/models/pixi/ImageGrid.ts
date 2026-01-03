@@ -7,14 +7,17 @@ import {
   Graphics,
   Color,
   SpritesheetData,
-  Dict, Sprite, PointData, FederatedPointerEvent
+  Dict, Sprite, PointData, FederatedPointerEvent, Text
 } from 'pixi.js';
+import PixiMath from '../../../shared/models/PixiMath';
 import { Colors } from '../../enums/Colors';
 import { StageIDS } from '../../enums/StageIDS';
 import { Grid } from '../data/Grid';
 import { Vector2 } from '../data/Vector2';
+import DefaultTextStyle from './DefaultTextStyle';
 import { ImageTile } from './ImageTile';
 import { IPixiSkeleton } from './IPixiSkeleton';
+import { PixiStageAnimator } from './PixiStageAnimator';
 
 //             5x5
 // (0,0) (1,0) (2,0) (3,0) (4,0)
@@ -50,8 +53,11 @@ function shuffledArray(array: number[]): number[] {
 export class ImageGrid implements IPixiSkeleton {
   private readonly container: Container;
   private sheet!: Spritesheet;
+  private grid!: Grid;
   private isActive: boolean = true;
   private tiles: Dict<ImageTile> = {};
+
+  private _weakApp!: WeakRef<Application>;
 
   constructor(
     public readonly image: Texture,
@@ -133,7 +139,9 @@ export class ImageGrid implements IPixiSkeleton {
   }
 
   async init(app: Application): Promise<void> {
+    this._weakApp = new WeakRef(app);
     const grid = this.initGrid();
+    this.grid = grid;
     const spritesheetData = this.grid2SpriteData(grid);
     this.sheet = new Spritesheet(this.image.source, spritesheetData);
     await this.sheet.parse();
@@ -142,7 +150,7 @@ export class ImageGrid implements IPixiSkeleton {
 
     this.initializeMouseMove();
 
-    const shuffledIds =
+    const initialLocationIndices =
       shuffledArray(
         Array(grid.size).fill(0).map((_, index)=> index)
       )
@@ -154,7 +162,7 @@ export class ImageGrid implements IPixiSkeleton {
         grid,
         this.sheet,
         index,
-        shuffledIds[index], // should be randomized
+        initialLocationIndices[index], // should be randomized
       )
       this.tiles[tile.gridTileID] = imgTile;
       await imgTile.init(app);
@@ -188,12 +196,24 @@ export class ImageGrid implements IPixiSkeleton {
 
   // region handle TileMovement
   releaseTile(): void {
+    console.log('releaseTile')
     const { tile } = this.tileToMoveData
     if (!tile) return
     this.tileToMoveData.tile = null;
+    const pos = Vector2.fromArray([
+      tile.graphic.x,
+      tile.graphic.y,
+    ]);
     tile.resetPosition()
     tile.graphic.zIndex = 0;
     this.container.sortChildren();
+    // const fromCoords =
+    const coords = this.grid.nearestGridTile(pos)
+    void this.toast(
+      tile.locTile.gridHumanTileID
+      + ' to: ' +
+      coords.gridHumanTileID
+    )
   }
 
   pickUpTile(tile: ImageTile, event: FederatedPointerEvent): void {
@@ -208,6 +228,59 @@ export class ImageGrid implements IPixiSkeleton {
     // sort child above rest
     tile.graphic.zIndex = 1;
     this.container.sortChildren();
+  }
+  // endregion
+
+  // region screen toasting
+  public async toast(text: string): Promise<void> {
+      const app = this._weakApp.deref();
+      if (!app) return;
+
+      const midOfScreen = new Vector2(
+        this.container.width / 2,
+        this.container.height / 2,
+      );
+      const downwards = midOfScreen.sumXY(0, this.container.height * .2);
+      const upwards = midOfScreen.subXY(0, this.container.height * .2);
+      const style = DefaultTextStyle.clone();
+      style.fontSize = 40;
+      const textToPop = new Text({
+        style,
+        text: text,
+      });
+      textToPop.anchor.set(0.5, 0.5);
+      textToPop.alpha = 0;
+      textToPop.x = midOfScreen.x;
+      textToPop.y = midOfScreen.y;
+      textToPop.zIndex = 100;
+      this.container.addChild(textToPop);
+
+      console.log(text);
+      await (
+        new PixiStageAnimator()
+          .addStage('Appear', null, (_, data)=> {
+            data.life += 0.06;
+            const { x, y } = Vector2.lerp(downwards, midOfScreen, data.life);
+            textToPop.x = x;
+            textToPop.y = y;
+            textToPop.alpha = PixiMath.lerp(0, 1, data.life)
+            return data.life >= 1;
+          })
+          .addStage('Stay', null, (_, data)=> (data.life += 0.06) >= 4)
+          .addStage('Disappear', null, (_, data)=> {
+            data.life += 0.06;
+            const { x, y } = Vector2.lerp(midOfScreen, upwards, data.life);
+            textToPop.x = x;
+            textToPop.y = y;
+            textToPop.alpha = PixiMath.lerp(1, 0, data.life)
+            return data.life >= 1;
+          })
+          .addStage('remove', null, () => {
+            this.container.removeChild(textToPop);
+            return true;
+          })
+          .run(app.ticker)
+      )
   }
   // endregion
 }

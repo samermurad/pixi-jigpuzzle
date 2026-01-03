@@ -1,4 +1,4 @@
-import { Size, Rectangle, Point, Dict } from 'pixi.js';
+import { Size, Rectangle, Point, Dict, PointData } from 'pixi.js';
 import { GridTile } from './GridTile';
 
 
@@ -89,5 +89,17 @@ export class Grid {
       this.texTileW,
       this.texTileH,
     )
+  }
+
+  public nearestGridTile(point: PointData): GridTile {
+    // Convert point -> grid coords in display/world space
+    const col = Math.round(point.x / this.tileW);
+    const row = Math.round(point.y / this.tileH);
+
+    // Clamp to valid grid bounds
+    const clampedCol = Math.max(0, Math.min(this.columns - 1, col));
+    const clampedRow = Math.max(0, Math.min(this.rows - 1, row));
+
+    return this.tileByCoords(clampedCol, clampedRow);
   }
 }

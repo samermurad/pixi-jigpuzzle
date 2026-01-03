@@ -29,6 +29,9 @@ export class GridTile {
     return `${this.row}x${this.col}`;
   }
 
+  get gridHumanTileID(): string {
+    return `${this.row+1}x${this.col+1}`;
+  }
   get frameRect(): { x: number; y: number; w: number; h: number } {
     return {
       x: this.texTileX,

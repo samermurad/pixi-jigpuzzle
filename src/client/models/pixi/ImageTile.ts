@@ -1,13 +1,22 @@
-import { Application, Container, Graphics, Sprite, Spritesheet } from 'pixi.js';
+import { Application, Container, Graphics, Sprite, Spritesheet, Text } from 'pixi.js';
 import { Colors } from '../../enums/Colors';
 import { StageIDS } from '../../enums/StageIDS';
 import { Grid } from '../data/Grid';
 import { GridTile } from '../data/GridTile';
+import DefaultTextStyle from './DefaultTextStyle';
 import { IPixiSkeleton } from './IPixiSkeleton';
 
 export class ImageTile implements IPixiSkeleton {
   public active: boolean = true;
   private readonly container: Container;
+
+  private sprite!: Sprite;
+  private texLabel!: Text;
+  private locLabel!: Text;
+
+
+  public texTile!: GridTile;
+  public locTile!: GridTile;
   // private sprite!: Sprite;
 
   constructor(
@@ -22,34 +31,53 @@ export class ImageTile implements IPixiSkeleton {
 
   async init(app: Application): Promise<void> {
     const texTile = this.grid.tileByIndex(this.texIndex)
-    const sprite = new Sprite(
-      this.spritesheet.textures[texTile.gridTileID]
-    )
     const locTile = this.grid.tileByIndex(this.initLocIndex);
+    this.texTile = texTile;
+    this.locTile = locTile;
 
-    // sprite.x = tile.tileX;
-    // sprite.y = tile.tileY;
-    sprite.width = locTile.tileW;
-    sprite.height = locTile.tileH;
-    this.container.addChild(sprite);
+    this.sprite = new Sprite();
+    this.texLabel = new Text({ style: DefaultTextStyle,  text: '' })
+    this.locLabel = new Text({ style: DefaultTextStyle,  text: '' })
+
+    this.container.addChild(this.sprite);
+    this.container.addChild(this.texLabel);
+    this.container.addChild(this.locLabel);
     this.container.addChild(
       new Graphics()
         .rect(0, 0, locTile.tileW, locTile.tileH)
         .stroke({
-          width: 2,
-          color: Colors.Secondary,
+          width: 1,
+          color: Colors.Separator,
           alignment: 1,
         })
     )
-    // this.container.addChild(sprite);
+    this.prepareLayout();
+  }
+
+  public setupLocationIndex(locIndex: number): void {
+    this.locTile = this.grid.tileByIndex(locIndex);
+    this.prepareLayout();
+  }
+  private prepareLayout(): void {
+    const texTile = this.texTile;
+    const locTile = this.locTile;
 
 
     this.container.x = locTile.tileX;
     this.container.y = locTile.tileY;
 
+    this.sprite.texture = this.spritesheet.textures[texTile.gridTileID];
+    this.sprite.width = locTile.tileW;
+    this.sprite.height = locTile.tileH;
 
+    this.texLabel.text = texTile.gridHumanTileID;
+
+    this.texLabel.anchor.set(0.5, 0.5);
+    this.texLabel.x = this.container.width / 2;
+    this.texLabel.y = this.container.height / 2;
+
+    this.locLabel.text = locTile.gridHumanTileID;
   }
-
   getStageID(): StageIDS | null {
     return null;
   }

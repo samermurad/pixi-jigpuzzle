@@ -60,6 +60,10 @@ export class Vector2 implements V2 {
     return Vector2.fromObject(Vector2.sub(this, another));
   }
 
+  subXY(x: number = 0, y: number = 0): Vector2 {
+    return Vector2.fromObject(Vector2.sub(this, Vector2.fromArray([x, y])));
+  }
+
   multiplyN(value: number): Vector2 {
     return new Vector2(this.x * value, this.y * value);
   }
@@ -78,6 +82,10 @@ export class Vector2 implements V2 {
 
   abs(): Vector2 {
     return Vector2.fromObject(Vector2.abs(this));
+  }
+
+  lerp(to: V2, t: number): Vector2 {
+    return Vector2.fromObject(Vector2.lerp(this, to, t));
   }
 
   length(): number {
@@ -131,6 +139,13 @@ export class Vector2 implements V2 {
 
   static abs(v2: V2): V2 {
     return new Vector2(Math.abs(v2.x), Math.abs(v2.y));
+  }
+
+  static lerp(from: V2, to: V2, t: number): V2 {
+    return {
+      x: from.x + (to.x - from.x) * t,
+      y: from.y + (to.y - from.y) * t
+    };
   }
 
   setX(newX: number): Vector2 {
