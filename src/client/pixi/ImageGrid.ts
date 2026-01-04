@@ -9,12 +9,12 @@ import {
   SpritesheetData,
   Dict, Sprite, PointData, FederatedPointerEvent, Text
 } from 'pixi.js';
-import PixiMath from '../../../shared/models/PixiMath';
-import { Colors } from '../../enums/Colors';
-import { StageIDS } from '../../enums/StageIDS';
-import { Grid, GridTileCoords } from '../data/Grid';
-import { GridTile } from '../data/GridTile';
-import { Vector2 } from '../data/Vector2';
+import PixiMath from '../../shared/models/PixiMath';
+import { Colors } from '../enums/Colors';
+import { StageIDS } from '../enums/StageIDS';
+import { Grid, GridTileCoords } from '../models/Grid';
+import { GridTile } from '../models/GridTile';
+import { Vector2 } from '../models/Vector2';
 import DefaultTextStyle from './DefaultTextStyle';
 import { ImageTile } from './ImageTile';
 import { IPixiSkeleton } from './IPixiSkeleton';
@@ -155,6 +155,7 @@ export class ImageGrid implements IPixiSkeleton {
     const spritesheetData = this.grid2SpriteData(grid);
     this.sheet = new Spritesheet(this.image.source, spritesheetData);
     await this.sheet.parse();
+    // this.sheet
     // console.log('Spritesheet ready to use!');
     console.log(grid, spritesheetData);
 

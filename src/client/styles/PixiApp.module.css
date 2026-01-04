@@ -15,7 +15,7 @@
     --btn-bg-color: #681300;
     --outer-color: #D72700;
     --inner-color: #FF3F147f;
-    composes: shinyAppButton from '../app.modules.css';
+    composes: shinyAppButton from 'app.modules.css';
 }
 .playButton::before {
     --outer-color: #D72700;

@@ -1,8 +1,8 @@
 import { Application, Container, Graphics, Sprite, Spritesheet, Text } from 'pixi.js';
-import { Colors } from '../../enums/Colors';
-import { StageIDS } from '../../enums/StageIDS';
-import { Grid } from '../data/Grid';
-import { GridTile } from '../data/GridTile';
+import { Colors } from '../enums/Colors';
+import { StageIDS } from '../enums/StageIDS';
+import { Grid } from '../models/Grid';
+import { GridTile } from '../models/GridTile';
 import DefaultTextStyle from './DefaultTextStyle';
 import { IPixiSkeleton } from './IPixiSkeleton';
 

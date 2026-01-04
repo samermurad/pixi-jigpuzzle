@@ -8,7 +8,9 @@
     "moduleResolution": "node", /* Standard way to find modules */
     "outDir": "../../dist/bundle",
     "noImplicitAny": true,
-    "strict": true
+    "strict": true,
+    "jsx": "react",
+    "jsxFactory": "DOMcreateElement"
     /* Bundler mode */
 //    "moduleResolution": "bundler",
 //    "allowImportingTsExtensions": true,

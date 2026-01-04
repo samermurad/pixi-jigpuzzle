@@ -1,9 +1,10 @@
 import { Colors } from '../enums/Colors';
 import { StageIDS } from '../enums/StageIDS';
-import { ImageGrid } from '../models/pixi/ImageGrid';
-import { IPixiSkeleton } from '../models/pixi/IPixiSkeleton';
-import { SquareLoader } from '../models/pixi/SquareLoader';
-import PixiAppStyles from './PixiApp.module.css';
+import { ImageGrid } from '../pixi/ImageGrid';
+import { IPixiSkeleton } from '../pixi/IPixiSkeleton';
+import { SquareLoader } from '../pixi/SquareLoader';
+import { DOMcreateElement } from '../ui/jsx-runtime';
+import PixiAppStyles from '../styles/PixiApp.module.css';
 import { Application, Assets, Container, Sprite, extensions, ExtensionType, Texture, Graphics } from 'pixi.js';
 import DefaultWallpaper from '../assets/img/ExamplePuzzle.jpg'
 import axios from 'axios';
@@ -20,18 +21,35 @@ export class PixiApp {
   VIRTUAL_HEIGHT: number = 600;
 
   constructor(public readonly root: HTMLDivElement) {
-    this.canvas = document.createElement('canvas');
-    const div = document.createElement('div');
-    div.classList.add(PixiAppStyles.container);
-    div.appendChild(this.canvas);
-    this.root.appendChild(div);
-    const button = document.createElement('button');
-    button.className = PixiAppStyles.playButton;
-    button.innerHTML = `<span>Reset</span>`;
-    button.onclick = () => {this.reset()}
-    div.appendChild(button);
+    root.appendChild(
+      <div className={PixiAppStyles.container}>
+        <canvas id="pixi-canvas"></canvas>
+        <button className={PixiAppStyles.playButton} onclick={() => this.reset()}>
+          <span>Reset</span>
+        </button>
+      </div>
+    )
+    this.canvas = document.getElementById('pixi-canvas') as HTMLCanvasElement;
   }
 
+  public async init() {
+    // PIXI UNSPLASH IMAGE LOADER
+    const unsplashImageLoading = {
+      extension: ExtensionType.LoadParser,
+      test: (url: string) => url.startsWith('https://images.unsplash.com/'),
+      async load(src: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          // @ts-ignore
+          img.onload = () => resolve(Texture.from(img))
+          img.onerror = reject
+          img.src = src
+        })
+      },
+    }
+    extensions.add(unsplashImageLoading)
+  }
   private initStages(): void {
       for (const stageID of Object.values(StageIDS)) {
           this.stages[stageID] = new Container();
@@ -75,23 +93,6 @@ export class PixiApp {
     // );
     // await loader.init(this.app);
     // this.addToStage(loader);
-    const unsplashImageLoading = {
-      extension: ExtensionType.LoadParser,
-      test: (url: string) => url.startsWith('https://images.unsplash.com/'),
-      async load(src: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-          const img = new Image()
-          img.crossOrigin = 'anonymous'
-          // @ts-ignore
-          img.onload = () => resolve(Texture.from(img))
-          img.onerror = reject
-          img.src = src
-        })
-      },
-    }
-
-    extensions.add(unsplashImageLoading)
-
     await this.startGame(3, 3)
 
     this.app.ticker.add(

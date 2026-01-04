@@ -1,5 +1,5 @@
 import { Ticker } from 'pixi.js';
-import { Deferred } from '../../../shared/models/Deferred';
+import { Deferred } from '../../shared/models/Deferred';
 
 type BaseInitData = { life: number };
 type PixiStageAnimatorStageRunner<S, T> =  (baseData: S, data: T, ticker: Ticker) => boolean;

@@ -104,9 +104,11 @@ export default {
         ],
     },
     resolve: {
-        extensions: ['.ts', '.js', '.jsx'],
+        extensions: ['.ts', '.js', '.jsx', '.tsx'],
     },
     target: 'web',
     plugins,
     performance: false,
+    devtool: false,
+    // devtool: 'eval',
 }
