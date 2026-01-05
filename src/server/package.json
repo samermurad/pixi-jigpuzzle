@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.server.json",
+    "build": "tsc --project tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "node ./dist/server/index.js",
     "watch": "tsc --project tsconfig.json --watch"

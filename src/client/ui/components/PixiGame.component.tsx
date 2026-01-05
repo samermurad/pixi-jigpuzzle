@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Application, Assets, Container, extensions, ExtensionType, Graphics, Texture, Ticker } from 'pixi.js';
 import DefaultWallpaper from '../../assets/img/ExamplePuzzle.jpg';
 import { StageIDS } from '../../enums/StageIDS';
+import { GridTileCoords } from '../../models/Grid';
 import { ImageGrid } from '../../pixi/ImageGrid';
 import { IPixiSkeleton } from '../../pixi/IPixiSkeleton';
 import PixiAppStyles from '../../styles/PixiApp.module.css';
@@ -11,6 +12,7 @@ import { createRef, DOMcreateElement } from '../jsx-runtime';
 
 export class PixiGame extends Component {
   private canvasRef = createRef<HTMLCanvasElement>();
+  private lvlSpan = createRef<HTMLSpanElement>();
   private app!: Application;
   stages: Record<StageIDS, Container> = {} as Record<StageIDS, Container>;
   updateAble: IPixiSkeleton[] = []
@@ -21,6 +23,17 @@ export class PixiGame extends Component {
 
   VIRTUAL_WIDTH: number = 350;
   VIRTUAL_HEIGHT: number = 600;
+
+  levels: GridTileCoords[] = [
+    { col: 3, row: 3 },
+    { col: 4, row: 3},
+    { col: 5, row: 4 },
+    { col: 6, row: 5 },
+    { col: 7, row: 6 },
+  ]
+
+  currentLevel: number = 0;
+
   // region Setup
   public async setup(): Promise<void> {
     // PIXI UNSPLASH IMAGE LOADER
@@ -73,6 +86,27 @@ export class PixiGame extends Component {
   // region UI Handlers
   async reset() {
     this.resetGame();
+  }
+
+  higherLevel() {
+
+    this.currentLevel++;
+    if (this.currentLevel >= this.levels.length) {
+      this.currentLevel = this.levels.length - 1;
+    }
+    const lvl = this.levels[this.currentLevel];
+    const str = `Col:${lvl.col} x Row:${lvl.row}`;
+    this.lvlSpan.current!.innerHTML = str;
+  }
+
+  lowerLevel() {
+    this.currentLevel--;
+    if (this.currentLevel <= 0) {
+      this.currentLevel = 0;
+    }
+    const lvl = this.levels[this.currentLevel];
+    const str = `Col:${lvl.col} x Row:${lvl.row}`;
+    this.lvlSpan.current!.innerHTML = str;
   }
   // endregion
   // region loops
@@ -169,8 +203,9 @@ export class PixiGame extends Component {
   // endregion
   // region GameState
   async startGame(columns: number, rows: number): Promise<void> {
+    const coords = this.levels[this.currentLevel];
     const img = await this.loadImg()
-    const imgGrid = new ImageGrid(img, 0, 0, this.VIRTUAL_WIDTH, this.VIRTUAL_HEIGHT, columns, rows);
+    const imgGrid = new ImageGrid(img, 0, 0, this.VIRTUAL_WIDTH, this.VIRTUAL_HEIGHT, coords.col, coords.row);
     await imgGrid.init(this.app);
     this.imageGrid = imgGrid;
     this.addToStage(imgGrid);
@@ -202,12 +237,31 @@ export class PixiGame extends Component {
   }
 
   view(): Element {
+    const lvl = this.levels[this.currentLevel];
+    const str = `Col:${lvl.col} x Row:${lvl.row}`;
     return (
       <div className={PixiAppStyles.container}>
       <canvas id="pixi-canvas" ref={this.canvasRef}></canvas>
-      <button className={PixiAppStyles.playButton} onclick={() => this.reset()}>
-        <span>Reset</span>
-      </button>
+        <span className={PixiAppStyles.colsXrows} ref={this.lvlSpan}>{str}</span>
+        <div className={PixiAppStyles.buttons}>
+          <button className={PixiAppStyles.playButtonSmall} onclick={() => {
+            this.lowerLevel();
+            this.reset()
+          } }>
+            <span>Easier</span>
+          </button>
+          <button className={PixiAppStyles.playButton} onclick={() => {
+            this.reset()
+          }}>
+            <span>Reset</span>
+          </button>
+          <button className={PixiAppStyles.playButtonSmall} onclick={() => {
+            this.higherLevel();
+            this.reset()
+          }}>
+            <span>Harder</span>
+          </button>
+        </div>
       </div>
     )
   }

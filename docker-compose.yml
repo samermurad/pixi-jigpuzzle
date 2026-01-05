@@ -1,0 +1,14 @@
+
+services:
+  app:
+    container_name: codiseus-jigg-puzzle-app
+    image: codiseus/jigg-puzzle-app
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      platforms:
+        - "linux/amd64"
+    volumes:
+      - .env.server:/app/.env.server
+    ports:
+      - "5053:5050"
