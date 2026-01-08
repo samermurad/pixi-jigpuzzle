@@ -4,6 +4,7 @@ import HTMLWebpackPlugin from 'html-webpack-plugin';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import LiveReloadPlugin from 'webpack-livereload-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 import paths from './webpack.paths.js';
 
 const { parsed: ENV_VARS } = dotenv.config({ path: '.env.client' })
@@ -30,10 +31,16 @@ const plugins = [
     }),
     new HTMLWebpackPlugin({
         template: paths.html,
+        favicon: paths.resolveProjectRelativePath(paths.clientDir,'public', 'icons', 'favicon.ico'),
         templateParameters: {
             // auto reload website in dev mode
             livereload: (isDev ? `<script src="http://localhost:${LIVE_RELOAD_PORT}/livereload.js"></script>` : ''),
         }
+    }),
+    new CopyPlugin({
+        patterns: [
+            { from: paths.publicAssetsDir, to: paths.publicAssetsOutDir },
+        ]
     })
 ]
 

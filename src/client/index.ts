@@ -30,5 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // const main = new Main('app');
   // (globalThis as any).main = main
   // await main.init();
+  // try {
+  //   await document.body.requestFullscreen()
+  // } catch (error) {
+  //   alert(error);
+  // }
   show(new PixiGame())
 })

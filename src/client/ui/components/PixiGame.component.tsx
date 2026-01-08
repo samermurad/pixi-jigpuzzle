@@ -3,6 +3,7 @@ import { Application, Assets, Container, extensions, ExtensionType, Graphics, Te
 import DefaultWallpaper from '../../assets/img/ExamplePuzzle.jpg';
 import { StageIDS } from '../../enums/StageIDS';
 import { GridTileCoords } from '../../models/Grid';
+import { LocalStorageObject } from '../../models/LocalStorageObject';
 import { ImageGrid } from '../../pixi/ImageGrid';
 import { IPixiSkeleton } from '../../pixi/IPixiSkeleton';
 import PixiAppStyles from '../../styles/PixiApp.module.css';
@@ -11,20 +12,28 @@ import { createRef, DOMcreateElement } from '../jsx-runtime';
 
 
 export class PixiGame extends Component {
+  private container = createRef<HTMLDivElement>();
+  private gameViewport = createRef<HTMLDivElement>();
   private canvasRef = createRef<HTMLCanvasElement>();
   private lvlSpan = createRef<HTMLSpanElement>();
+  private dataSpan = createRef<HTMLSpanElement>();
+  private mainBtn = createRef<HTMLButtonElement>();
+  private btsContainer = createRef<HTMLButtonElement>();
   private app!: Application;
   stages: Record<StageIDS, Container> = {} as Record<StageIDS, Container>;
   updateAble: IPixiSkeleton[] = []
+
+  private resizeObs?: ResizeObserver;
 
   colors = [0xff3b3b, 0xffd93b, 0x3bff6f, 0x3bb7ff, 0xb83bff];
   confetti: Graphics[] = [];
   private imageGrid!: ImageGrid;
 
   VIRTUAL_WIDTH: number = 350;
-  VIRTUAL_HEIGHT: number = 600;
+  VIRTUAL_HEIGHT: number = 500;
 
   levels: GridTileCoords[] = [
+    // { col: 2, row: 2 },
     { col: 3, row: 3 },
     { col: 4, row: 3},
     { col: 5, row: 4 },
@@ -33,6 +42,8 @@ export class PixiGame extends Component {
   ]
 
   currentLevel: number = 0;
+
+  puzzlesSolved = new LocalStorageObject<{ solved: number }>('puzzlesSolved', { solved: 0 });
 
   // region Setup
   public async setup(): Promise<void> {
@@ -69,6 +80,9 @@ export class PixiGame extends Component {
     this.setupStages();
     this.setupLoop();
 
+    this.bindResizeHandling();
+    this.puzzlesSolved.load();
+    this.updatePuzzlesSolved();
     await this.startGame(4, 4)
   }
   private setupStages(): void {
@@ -145,6 +159,9 @@ export class PixiGame extends Component {
           this.imageGrid.setInteractionEnabled(false);
           this.confettiAnim(240)
           this.imageGrid.toast(["Amazing!", "Good Job!", "Well done!!", "Yuuhuuu!!"][Math.floor(Math.random() * 4)], true);
+          this.popButtonForNext(true);
+          this.bumpPuzzleSolved();
+          this.updatePuzzlesSolved();
         }
       }
     }
@@ -218,6 +235,7 @@ export class PixiGame extends Component {
     this.imageGrid.graphic.parent?.removeChild(this.imageGrid.graphic)
     // @ts-ignore
     this.imageGrid = null;
+    this.popButtonForNext(false);
     await this.startGame(4, 4);
   }
   // endregion
@@ -236,21 +254,42 @@ export class PixiGame extends Component {
     this.setup()
   }
 
+  public popButtonForNext(yes: boolean): void {
+    if (yes) {
+      this.btsContainer.current!.className = `${PixiAppStyles.buttons} ${PixiAppStyles.next}`;
+      this.mainBtn.current!.innerHTML = `<span>Next</span>`;
+    } else {
+      this.btsContainer.current!.className = `${PixiAppStyles.buttons}`;
+      this.mainBtn.current!.innerHTML = `<span>Reset</span>`;
+    }
+  }
+
+  public bumpPuzzleSolved(): void {
+    this.puzzlesSolved.value!.solved++;
+    this.puzzlesSolved.save()
+  }
+  public updatePuzzlesSolved(): void {
+    this.dataSpan.current!.innerHTML = 'Puzzles Solved: ' + (this.puzzlesSolved.value?.solved ?? 0);
+  }
   view(): Element {
     const lvl = this.levels[this.currentLevel];
     const str = `Col:${lvl.col} x Row:${lvl.row}`;
+    const PuzzlesSolved = 'Puzzles Solved: ' + (this.puzzlesSolved.value?.solved ?? 0)
     return (
-      <div className={PixiAppStyles.container}>
-      <canvas id="pixi-canvas" ref={this.canvasRef}></canvas>
+      <div ref={this.container} className={PixiAppStyles.container}>
+        <div ref={this.gameViewport}>
+          <canvas id="pixi-canvas" ref={this.canvasRef}></canvas>
+        </div>
         <span className={PixiAppStyles.colsXrows} ref={this.lvlSpan}>{str}</span>
-        <div className={PixiAppStyles.buttons}>
+        <span className={PixiAppStyles.colsXrows} ref={this.dataSpan}>{PuzzlesSolved} </span>
+        <div ref={this.btsContainer} className={PixiAppStyles.buttons}>
           <button className={PixiAppStyles.playButtonSmall} onclick={() => {
             this.lowerLevel();
             this.reset()
           } }>
             <span>Easier</span>
           </button>
-          <button className={PixiAppStyles.playButton} onclick={() => {
+          <button ref={this.mainBtn} className={PixiAppStyles.playButton} onclick={() => {
             this.reset()
           }}>
             <span>Reset</span>
@@ -264,6 +303,73 @@ export class PixiGame extends Component {
         </div>
       </div>
     )
+  }
+  // endregion
+
+  // region Virtual Size
+  private updateViewportScale() {
+    const containerEl = this.gameViewport?.current;
+    if (!containerEl || !this.app || !this.stages[StageIDS.Main] || !this.imageGrid) return;
+    // what the layout says
+    const rect = containerEl.getBoundingClientRect();
+
+    const vw = this.VIRTUAL_WIDTH;
+    const vh = this.VIRTUAL_HEIGHT;
+    // actual available size
+    const containerWidth = rect.width;
+    const containerHeight = rect.height;
+    // very important: never let the game canvas be taller than the viewport
+    // const topY = this.gameFieldLayer.y;
+    // const further = 50
+    const topY = this.imageGrid.y - this.imageGrid.height / 2
+    const bottomY = this.imageGrid.graphic.height + this.imageGrid.graphic.height / 2;
+    const contentHeight = bottomY - topY;
+    const contentWidth = vw;
+
+    const scaleX = containerWidth / contentWidth;
+    const scaleY = containerHeight / contentHeight;
+    const scale = Math.min(scaleX, scaleY);
+
+    // uniform scale to fit in this box
+    // we keep the canvas the size of the container visually,
+    // but the game content is scaled down to always fit
+    this.app.renderer.resize(containerWidth, containerHeight);
+    this.app.stage.scale.set(scale);
+
+    const scaledContentWidth = contentWidth * scale;
+    const offsetX = (containerWidth - scaledContentWidth) / 2;
+
+    const scaledContentHeight = contentHeight * scale;
+    let offsetY;
+    // If the content fits vertically → center it
+    if (scaledContentHeight < containerHeight) {
+      offsetY = (containerHeight - scaledContentHeight) / 2 - topY * scale;
+    } else {
+      // Otherwise stick to top (prevents clipping)
+      offsetY = -topY * scale;
+    }
+    this.app.stage.position.set(offsetX, offsetY);
+  }
+
+
+  // endregion
+
+  // region Window Resizing
+  private bindResizeHandling() {
+    if (!this.container?.current) return;
+
+    // this.resizeObs = new ResizeObserver(() => {
+    //   console.log('resizeObs');
+    //   this.handleResize();
+    // });
+    // this.resizeObs.observe(this.container!.current);
+  }
+
+  private handleResize() {
+    // if (!this.app || !this.isReady()) return;
+    if (!this.app) return;
+
+    this.updateViewportScale();
   }
   // endregion
 }

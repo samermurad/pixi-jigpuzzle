@@ -1,0 +1,15 @@
+{
+  "name": "JiggPuzzle by Samer Murad",
+  "short_name": "JiggPuzzle",
+  "description": "Mini Puzzle Game",
+  "start_url": "/app",
+  "id": "/app",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#254441",
+  "theme_color": "#DB504A",
+  "icons": [
+    { "src": "/app/public/icons/192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/app/public/icons/512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

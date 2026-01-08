@@ -1,29 +1,104 @@
 
 .container {
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    background-color: var(--background-secondary);
+    overscroll-behavior-y: none;
+    /*background-color: var(--background-secondary);*/
     border-radius: 15px;
-    height: 740px;
+    /*height: 740px;*/
     width: 350px;
+    /*min-width: 350px;*/
+    /*min-height: 750px;*/
     overflow: hidden;
+
+    transition: all 0.2s linear;
+}
+
+
+@media screen and (width >= 1024px) {
+    .container {
+        /*height: 740px;*/
+        width: 450px;
+    }
+}
+@media screen and (width <= 1024px) {
+    .container {
+        width: 100dvw;
+        border-radius: 0;
+    }
+}
+
+@media screen and (height <= 1024px) {
+    .container {
+        height: 100dvh;
+        border-radius: 0;
+    }
+}
+
+.container canvas {
+    background-color: var(--background-primary);
+    border: 10px solid var(--background-secondary);
+    border-radius: 8px;
 }
 
 .colsXrows {
-    padding-top: 20px;
+    padding-top: 8px;
     color: var(--text-light);
     filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 1));
 }
 
 .buttons {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     width: 100%;
     padding: 16px;
+    transition: all 1s ease;
 }
+
+@keyframes toMiddle {
+    0% {
+        position: relative;
+        top: unset;
+        left: unset;
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    100% {
+        opacity: 1;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+.buttons.next {
+    position: absolute;
+    /*top: 50%;*/
+    /*left: 50%;*/
+    animation: toMiddle 2s forwards;
+}
+
+.buttons.next .playButtonSmall {
+    pointer-events: none;
+    opacity: 0;
+}
+
+
 .playButton {
     --btn-bg-color: #681300;
     --outer-color: #D72700;

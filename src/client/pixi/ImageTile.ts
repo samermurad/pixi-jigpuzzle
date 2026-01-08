@@ -11,6 +11,7 @@ export class ImageTile implements IPixiSkeleton {
   private readonly container: Container;
 
   private sprite!: Sprite;
+  private mask!: Sprite;
   private texLabel!: Text;
   private locLabel!: Text;
 
@@ -40,13 +41,20 @@ export class ImageTile implements IPixiSkeleton {
     this.texLabel = new Text({ style: DefaultTextStyle,  text: '' })
     this.locLabel = new Text({ style: DefaultTextStyle,  text: '' })
     this.border = new Graphics()
-      .rect(0, 0, locTile.tileW, locTile.tileH)
+      .roundRect(0, 0, locTile.tileW, locTile.tileH, 8)
       .stroke({
-        width: 1,
-        color: Colors.Separator,
+        width: 2,
+        color: Colors.Primary,
         alignment: 1,
       })
+
+    const maskGraphic = new Graphics()
+    maskGraphic.roundRect(0, 0, locTile.tileW, locTile.tileH, 8)
+    maskGraphic.fill(0xff_ff_ff);
+    this.mask = new Sprite(app.renderer.generateTexture(maskGraphic));
+    this.container.addChild(this.mask);
     this.container.addChild(this.sprite);
+    this.container.mask = this.mask;
     // this.container.addChild(this.texLabel);
     // this.container.addChild(this.locLabel);
     this.container.addChild(this.border)
@@ -65,6 +73,8 @@ export class ImageTile implements IPixiSkeleton {
 
     this.container.x = locTile.tileX;
     this.container.y = locTile.tileY;
+
+    this.container.mask = isOnRightSpot ? null : this.mask;
 
     this.sprite.texture = this.spritesheet.textures[texTile.gridTileID];
     this.sprite.width = locTile.tileW;

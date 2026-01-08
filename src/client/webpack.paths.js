@@ -25,6 +25,8 @@ const paths = {
     entry: resolveProjectRelativePath(clientDir, 'index.ts'),
     html: resolveProjectRelativePath(clientDir, 'index.html'),
     tsConfig: resolveProjectRelativePath(clientDir, 'tsconfig.json'),
+    publicAssetsDir: resolveProjectRelativePath(clientDir, 'public'),
+    publicAssetsOutDir: resolveProjectRelativePath(clientOutDir, 'public'),
 }
 export default paths;
 
