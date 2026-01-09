@@ -12,3 +12,31 @@ services:
       - .env.server:/app/.env.server
     ports:
       - "5053:5050"
+  build-local-remote:
+    container_name: codiseus-jigg-puzzle-app-local-remote
+    image: codiseus/jigg-puzzle-app-local-remote
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-remote
+      platforms:
+        - "linux/amd64"
+    volumes:
+      - .env.server:/app/.env.server
+      - ./.dist-remote:/output
+    ports:
+      - "5053:5050"
+
+  build-remote-slim:
+    container_name: codiseus-jigg-puzzle-app-slim
+    image: codiseus/jigg-puzzle-app-slim
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-slim
+      platforms:
+        - "linux/amd64"
+    volumes:
+      - .env.server:/app/.env.server
+#      - ./.dist-remote:/output
+    ports:
+      - "5053:5050"
+
