@@ -7,32 +7,47 @@
     align-items: center;
     overscroll-behavior-y: none;
     border-radius: 15px;
-    width: 350px;
-    overflow: hidden;
+    width: 450px;
+    height: 95dvh;
+    overflow: scroll;
 
     transition: all 0.2s linear;
 }
 
+.gameViewport {
+    display: flex;
+    flex: 4 4 auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.labels {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
-@media screen and (width >= 1024px) {
-    .container {
-        /*height: 740px;*/
-        width: 450px;
-    }
-}
-@media screen and (width <= 1024px) {
-    .container {
-        width: 100dvw;
-        border-radius: 0;
-    }
-}
+/*@media screen and (width >= 1024px) {*/
+/*    .container {*/
+/*        !*height: 740px;*!*/
+/*        width: 450px;*/
+/*    }*/
+/*}*/
+/*@media screen and (width <= 1024px) {*/
+/*    .container {*/
+/*        width: 100dvw;*/
+/*        border-radius: 0;*/
+/*    }*/
+/*}*/
 
-@media screen and (height <= 1024px) {
-    .container {
-        height: 100dvh;
-        border-radius: 0;
-    }
-}
+/*@media screen and (height <= 1024px) {*/
+/*    .container {*/
+/*        height: 95dvh;*/
+/*        border-radius: 0;*/
+/*    }*/
+/*}*/
 
 .container canvas {
     background-color: var(--background-primary);
@@ -54,6 +69,7 @@
     width: 100%;
     padding: 16px;
     transition: all 1s ease;
+    flex: 1 1 auto;
 }
 
 @keyframes toMiddle {

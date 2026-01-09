@@ -1,6 +1,7 @@
 import './styles/app.styles.css'
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import App from './app/App';
 import { PixiApp } from './app/PixiApp';
 // import { Component } from './ui/Component';
 import { PixiGame } from './ui/components/PixiGame.component';
@@ -48,5 +49,5 @@ document.body.innerHTML = '<div id="app"></div>';
 
 // Render your React component instead
 const root = createRoot(document.getElementById('app')!);
-// root.render(<PixiGame />);
-root.render(<Game />);
+root.render(<App />);
+// root.render(<Game />);

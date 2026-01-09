@@ -15,9 +15,8 @@
 }
 
 .button::before {
-    --secondary-color: color-mix(in srgb, var(--main-color) 100%, #fff 30%);
-    /*--darker-version: color-mix(in srgb, var(--base-color) 100%, #000 27%);*/
-    transition: all 0.2s ease-in-out;
+    --secondary-color: color-mix(in srgb, var(--main-color) 100%, #fff 25%);
+    transition: all 0.1s ease-in-out;
     content: " ";
     position: absolute;
     top: 0;
@@ -25,16 +24,23 @@
     right: 0;
     bottom: 10%;
     background: var(--secondary-color);
-    border-radius: calc(1 * var(--vh, 1vh));
+    border-radius: inherit;
     z-index: 0;
     display: block;
     margin: 0;
 }
 
 .button:active {
-    transform: scale(1.1, 0.9);
+    --scales-x: 1.1;
+    --scales-y: 0.9;
+    transform: scale(var(--scales-x), var(--scales-y));
     transition-delay: 0s;
     transition-duration: 0.1s;
+}
+
+.button:active::before {
+    bottom: 0;
+    /*transition-duration: 0.05s;*/
 }
 
 .button[disabled] {
@@ -44,21 +50,27 @@
 }
 
 .button span, .button p {
+    display: block;
     font-size: 1.3em;
     position: relative;
     color: white;
     z-index: 1;
 }
 
-.shinyAppButton {
-    composes: button;
-    --btn-bg-color: #5e5e5e;
-    background: var(--btn-bg-color);
+.button:active span, .button:active p {
+    transform: scale(calc(1.4 / var(--scales-x)), calc(1.4 / var(--scales-y)));
 }
 
-.shinyAppButton::before {
-    --outer-color: #bfbfbf;
-    --inner-color: #ececec;
+.shiny {
+    composes: button;
+    --btn-bg-color: #5e5e5e;
+    --tertiary-color:  color-mix(in srgb, var(--main-color) 100%, #000 80%);
+    background: var(--tertiary-color);
+}
+
+.shiny::before {
+    --outer-color: var(--main-color);
+    --inner-color: var(--secondary-color);
     --start-p: 32%;
     --end-p: calc(var(--start-p) + 23%);
     bottom: 20%;

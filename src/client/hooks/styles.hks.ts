@@ -27,8 +27,9 @@ export function useClasses(...classNames: string[]): [string, ClassesHandlers] {
   return [classesStr, handler.current];
 }
 
-export function useClassesStatic(...classNames: string[]): string {
-  return useMemo<string>(() => classNames.join(' '), []);
+export function useClassesStatic(...classNames: (string|undefined)[]): [string] {
+  const classes = classNames.filter(nonNull => !!nonNull).join(' ');
+  return [useMemo<string>(() => classes, [classes])];
 }
 
 export function useStyles(styleDict: Record<string, unknown>): React.CSSProperties {

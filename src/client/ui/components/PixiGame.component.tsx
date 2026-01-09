@@ -1,13 +1,15 @@
 import axios from 'axios';
 import { Application, Assets, Container, extensions, ExtensionType, Graphics, Texture, Ticker } from 'pixi.js';
+import React, { Component, createRef } from 'react';
+import PixiAppStyles from 'styles/PixiApp.module.css';
 import DefaultWallpaper from '../../assets/img/ExamplePuzzle.jpg';
+import { Colors } from '../../enums/Colors';
 import { StageIDS } from '../../enums/StageIDS';
 import { GridTileCoords } from '../../models/Grid';
 import { LocalStorageObject } from '../../models/LocalStorageObject';
 import { ImageGrid } from '../../pixi/ImageGrid';
 import { IPixiSkeleton } from '../../pixi/IPixiSkeleton';
-import PixiAppStyles from 'styles/PixiApp.module.css';
-import React, { Component, createRef } from 'react';
+import Button from '../atoms/Button';
 
 export class PixiGame extends Component {
   private container = createRef<HTMLDivElement>();
@@ -62,8 +64,11 @@ export class PixiGame extends Component {
     }
     extensions.add(unsplashImageLoading)
 
+    this.VIRTUAL_WIDTH = this.gameViewport.current!.getBoundingClientRect().width
+    this.VIRTUAL_HEIGHT = this.gameViewport.current!.getBoundingClientRect().height
     const vw = this.VIRTUAL_WIDTH;
     const vh = this.VIRTUAL_HEIGHT;
+
     this.app = new Application();
     // Renderer runs in virtual space; we scale it later to fit container
     await this.app.init({
@@ -280,29 +285,26 @@ export class PixiGame extends Component {
     const PuzzlesSolved = 'Puzzles Solved: ' + (this.puzzlesSolved.value?.solved ?? 0)
     return (
       <div ref={this.container} className={PixiAppStyles.container}>
-        <div ref={this.gameViewport}>
+        <div ref={this.gameViewport} className={PixiAppStyles.gameViewport}>
           <canvas id="pixi-canvas" ref={this.canvasRef}></canvas>
         </div>
-        <span className={PixiAppStyles.colsXrows} ref={this.lvlSpan}>{str}</span>
-        <span className={PixiAppStyles.colsXrows} ref={this.dataSpan}>{PuzzlesSolved} </span>
+        <div className={PixiAppStyles.labels}>
+          <span className={PixiAppStyles.colsXrows} ref={this.lvlSpan}>{str}</span>
+          <span className={PixiAppStyles.colsXrows} ref={this.dataSpan}>{PuzzlesSolved} </span>
+        </div>
         <div ref={this.btsContainer} className={PixiAppStyles.buttons}>
-          <button className={PixiAppStyles.playButtonSmall} onClick={() => {
+
+          <Button className={PixiAppStyles.playButtonSmall} onClick={() => {
             this.lowerLevel();
             this.reset()
-          } }>
-            <span>Easier</span>
-          </button>
-          <button ref={this.mainBtn} className={PixiAppStyles.playButton} onClick={() => {
+          }} title="Easier" color={Colors.BackgroundSecondary} />
+          <Button ref={this.mainBtn} onClick={() => {
             this.reset()
-          }}>
-            <span>Reset</span>
-          </button>
-          <button className={PixiAppStyles.playButtonSmall} onClick={() => {
+          }} title="Reset" />
+          <Button className={PixiAppStyles.playButtonSmall} onClick={() => {
             this.higherLevel();
             this.reset()
-          }}>
-            <span>Harder</span>
-          </button>
+          }} title="Harder" color={Colors.BackgroundSecondary} />
         </div>
       </div>
     )
@@ -361,11 +363,11 @@ export class PixiGame extends Component {
   private bindResizeHandling() {
     if (!this.container?.current) return;
 
-    // this.resizeObs = new ResizeObserver(() => {
-    //   console.log('resizeObs');
-    //   this.handleResize();
-    // });
-    // this.resizeObs.observe(this.container!.current);
+    this.resizeObs = new ResizeObserver(() => {
+      console.log('resizeObs');
+      this.handleResize();
+    });
+    this.resizeObs.observe(this.container!.current);
   }
 
   private handleResize() {
@@ -373,6 +375,7 @@ export class PixiGame extends Component {
     if (!this.app) return;
 
     this.updateViewportScale();
+    // this.reset()
   }
   // endregion
 }
