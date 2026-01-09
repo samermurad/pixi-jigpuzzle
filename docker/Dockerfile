@@ -1,5 +1,5 @@
 # INSTALL
-FROM node:22.16.0-alpine as jigpuzzle-installer
+FROM node:22.16.0-alpine AS jigpuzzle-installer
 LABEL jigpuzzle-build-installer=true
 WORKDIR /build
 COPY package.json package-lock.json ./
@@ -15,7 +15,7 @@ RUN npm install -ws
 
 
 # BUILD TYPESCRIPT AND WEBPACK STUFF
-FROM jigpuzzle-installer as jigpuzzle-builder
+FROM jigpuzzle-installer AS jigpuzzle-builder
 LABEL jigpuzzle-build-installer=false
 LABEL jigpuzzle-build-builder=true
 WORKDIR /build
@@ -26,7 +26,7 @@ RUN npm run build
 
 # COPY BUILT FILES INTO NEW IMAGE (WITH ORIGINAL SOURCE CODE)
 # INCLUDE scripts/ AND db/ FOR RUNTIME MANAGEMENT (DB PATCHES AND VARIOUS CONVENIENCE SCRIPTS)
-FROM jigpuzzle-builder as jigpuzzle-app
+FROM jigpuzzle-builder AS jigpuzzle-app
 LABEL jigpuzzle-build-installer=false
 LABEL jigpuzzle-build-builder=false
 
