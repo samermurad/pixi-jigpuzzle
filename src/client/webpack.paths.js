@@ -22,7 +22,7 @@ const paths = {
     clientOutDir,
     projectSharedDir,
     nodeModulesDir,
-    entry: resolveProjectRelativePath(clientDir, 'index.ts'),
+    entry: resolveProjectRelativePath(clientDir, 'index.tsx'),
     html: resolveProjectRelativePath(clientDir, 'index.html'),
     tsConfig: resolveProjectRelativePath(clientDir, 'tsconfig.json'),
     publicAssetsDir: resolveProjectRelativePath(clientDir, 'public'),

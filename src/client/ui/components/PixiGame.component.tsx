@@ -6,10 +6,8 @@ import { GridTileCoords } from '../../models/Grid';
 import { LocalStorageObject } from '../../models/LocalStorageObject';
 import { ImageGrid } from '../../pixi/ImageGrid';
 import { IPixiSkeleton } from '../../pixi/IPixiSkeleton';
-import PixiAppStyles from '../../styles/PixiApp.module.css';
-import { Component } from '../Component';
-import { createRef, DOMcreateElement } from '../jsx-runtime';
-
+import PixiAppStyles from 'styles/PixiApp.module.css';
+import React, { Component, createRef } from 'react';
 
 export class PixiGame extends Component {
   private container = createRef<HTMLDivElement>();
@@ -18,7 +16,7 @@ export class PixiGame extends Component {
   private lvlSpan = createRef<HTMLSpanElement>();
   private dataSpan = createRef<HTMLSpanElement>();
   private mainBtn = createRef<HTMLButtonElement>();
-  private btsContainer = createRef<HTMLButtonElement>();
+  private btsContainer = createRef<HTMLDivElement>();
   private app!: Application;
   stages: Record<StageIDS, Container> = {} as Record<StageIDS, Container>;
   updateAble: IPixiSkeleton[] = []
@@ -69,6 +67,7 @@ export class PixiGame extends Component {
     this.app = new Application();
     // Renderer runs in virtual space; we scale it later to fit container
     await this.app.init({
+      // resizeTo: this.gameViewport.current!,
       canvas: this.canvasRef.current!,
       width: vw,
       height: vh,
@@ -250,9 +249,13 @@ export class PixiGame extends Component {
   // endregion
   // region Component Implementation
 
-  protected didMount() {
+  componentDidMount() {
     this.setup()
   }
+
+  // protected didMount() {
+  //   this.setup()
+  // }
 
   public popButtonForNext(yes: boolean): void {
     if (yes) {
@@ -271,7 +274,7 @@ export class PixiGame extends Component {
   public updatePuzzlesSolved(): void {
     this.dataSpan.current!.innerHTML = 'Puzzles Solved: ' + (this.puzzlesSolved.value?.solved ?? 0);
   }
-  view(): Element {
+  render() {
     const lvl = this.levels[this.currentLevel];
     const str = `Col:${lvl.col} x Row:${lvl.row}`;
     const PuzzlesSolved = 'Puzzles Solved: ' + (this.puzzlesSolved.value?.solved ?? 0)
@@ -283,18 +286,18 @@ export class PixiGame extends Component {
         <span className={PixiAppStyles.colsXrows} ref={this.lvlSpan}>{str}</span>
         <span className={PixiAppStyles.colsXrows} ref={this.dataSpan}>{PuzzlesSolved} </span>
         <div ref={this.btsContainer} className={PixiAppStyles.buttons}>
-          <button className={PixiAppStyles.playButtonSmall} onclick={() => {
+          <button className={PixiAppStyles.playButtonSmall} onClick={() => {
             this.lowerLevel();
             this.reset()
           } }>
             <span>Easier</span>
           </button>
-          <button ref={this.mainBtn} className={PixiAppStyles.playButton} onclick={() => {
+          <button ref={this.mainBtn} className={PixiAppStyles.playButton} onClick={() => {
             this.reset()
           }}>
             <span>Reset</span>
           </button>
-          <button className={PixiAppStyles.playButtonSmall} onclick={() => {
+          <button className={PixiAppStyles.playButtonSmall} onClick={() => {
             this.higherLevel();
             this.reset()
           }}>

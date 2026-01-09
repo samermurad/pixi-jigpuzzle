@@ -6,12 +6,8 @@
     justify-content: flex-start;
     align-items: center;
     overscroll-behavior-y: none;
-    /*background-color: var(--background-secondary);*/
     border-radius: 15px;
-    /*height: 740px;*/
     width: 350px;
-    /*min-width: 350px;*/
-    /*min-height: 750px;*/
     overflow: hidden;
 
     transition: all 0.2s linear;
@@ -103,7 +99,7 @@
     --btn-bg-color: #681300;
     --outer-color: #D72700;
     --inner-color: #FF3F147f;
-    composes: shinyAppButton from 'app.modules.css';
+    composes: shinyAppButton from 'app.module.css';
 }
 .playButton::before {
     --outer-color: #D72700;

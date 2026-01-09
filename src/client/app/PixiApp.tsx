@@ -21,14 +21,14 @@ export class PixiApp {
   VIRTUAL_HEIGHT: number = 600;
 
   constructor(public readonly root: HTMLDivElement) {
-    root.appendChild(
-      <div className={PixiAppStyles.container}>
-        <canvas id="pixi-canvas"></canvas>
-        <button className={PixiAppStyles.playButton} onclick={() => this.reset()}>
-          <span>Reset</span>
-        </button>
-      </div>
-    )
+    // root.appendChild(
+    //   <div className={PixiAppStyles.container}>
+    //     <canvas id="pixi-canvas"></canvas>
+    //     <button className={PixiAppStyles.playButton} onclick={() => this.reset()}>
+    //       <span>Reset</span>
+    //     </button>
+    //   </div>
+    // )
     this.canvas = document.getElementById('pixi-canvas') as HTMLCanvasElement;
   }
 

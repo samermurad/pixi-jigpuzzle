@@ -1,7 +1,10 @@
 declare module '*.module.css' {
-  const classes: { readonly [key: string]: string };
-  export default classes;
+  const styles: {
+    [key: string]: string
+  };
+  export default styles;
 }
+
 
 declare module '*.css' {
   const css: string;

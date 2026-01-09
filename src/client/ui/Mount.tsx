@@ -13,5 +13,6 @@ export function Mount<T extends Component>({ component }: MountProps<T>): Elemen
     component.mount(ref.current);
   });
 
-  return <div ref={ref}></div>;
+  return DOMcreateElement(component, ref.current);
+  // return <div ref={ref}></div>;
 }

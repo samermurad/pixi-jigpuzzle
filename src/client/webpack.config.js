@@ -6,6 +6,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import LiveReloadPlugin from 'webpack-livereload-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import paths from './webpack.paths.js';
+// import tsconfig from './tsconfig.json' with { type: "json" };
 
 const { parsed: ENV_VARS } = dotenv.config({ path: '.env.client' })
 
@@ -112,6 +113,11 @@ export default {
     },
     resolve: {
         extensions: ['.ts', '.js', '.jsx', '.tsx'],
+        // aliasFields: ['browser'],
+        alias: {
+            'ui-styles': paths.resolveProjectRelativePath(paths.clientDir, 'styles', 'ui'),
+            "styles": paths.resolveProjectRelativePath(paths.clientDir, 'styles')
+        }
     },
     target: 'web',
     plugins,

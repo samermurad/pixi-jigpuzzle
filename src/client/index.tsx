@@ -1,7 +1,10 @@
 import './styles/app.styles.css'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import { PixiApp } from './app/PixiApp';
-import { Component } from './ui/Component';
+// import { Component } from './ui/Component';
 import { PixiGame } from './ui/components/PixiGame.component';
+import Game from './ui/pages/Game';
 
 class Main {
   root: HTMLDivElement;
@@ -16,13 +19,13 @@ class Main {
     await this.app.setup()
   }
 }
-let current: Component | null = null;
-
-function show(next: Component) {
-  current?.unmount();
-  current = next;
-  current.mount(document.getElementById("root")!);
-}
+// let current: Component | null = null;
+//
+// function show(next: Component) {
+//   current?.unmount();
+//   current = next;
+//   current.mount(document.getElementById("root")!);
+// }
 
 // show(new MainMenu());
 // show(new GameScreen());
@@ -35,5 +38,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // } catch (error) {
   //   alert(error);
   // }
-  show(new PixiGame())
+  // show(new PixiGame())
 })
+// createRoot()
+
+
+// Clear the existing HTML content
+document.body.innerHTML = '<div id="app"></div>';
+
+// Render your React component instead
+const root = createRoot(document.getElementById('app')!);
+// root.render(<PixiGame />);
+root.render(<Game />);
