@@ -32,6 +32,9 @@ export const getRandomPhoto = async (w: number, h: number) => {
     // @ts-ignore
     return { url };
   } catch (error) {
+    if ((error as any).response?.code?.() === 'ENOTFOUND') {
+      throw error;
+    }
     console.log(error);
     const photo = dataset[Math.floor(Math.random() * dataset.length)]
     // @ts-ignore

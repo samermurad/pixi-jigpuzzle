@@ -9,7 +9,7 @@ import { useClasses } from '../../hooks/styles.hks';
 import Button from '../atoms/Button';
 
 
-function Game(): ReactElement {
+function GamePage(): ReactElement {
   const [stats, setStats] = useLocalStorage('puzzlesSolved', { solved: 0 })
 
   const [spanClasses, spanClassesHandler] = useClasses(GameStyles.span)
@@ -33,4 +33,4 @@ function Game(): ReactElement {
   )
 }
 
-export default Game;
+export default GamePage;

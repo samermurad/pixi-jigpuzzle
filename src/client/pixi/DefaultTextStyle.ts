@@ -4,7 +4,8 @@ import { TextStyle } from 'pixi.js';
 const DefaultTextStyle: TextStyle = new TextStyle(
   {
     fontSize: 12,
-    fontFamily: ['Luckiest Guy RUS-BEL-UKR', 'sans-serif'],
+    // fontFamily: ['Luckiest Guy RUS-BEL-UKR', 'sans-serif'],
+    fontFamily: ['AppDefault', 'sans-serif'],
     fontStyle: 'normal',
     // fontWeight: 'bold',
     align: 'center',

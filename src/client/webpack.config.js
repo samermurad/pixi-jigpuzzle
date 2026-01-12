@@ -101,7 +101,7 @@ export default {
                         ],
                     },
                     {
-                        test: /\.(png|jpg|gif)$/,
+                        test: /\.(png|jpg|gif|tff)$/,
                         type: 'asset/resource',
                         generator: {
                             filename: 'static/[name]__[hash][ext][query]',

@@ -92,6 +92,15 @@ const hexToHsb = (hex: string): { h: number; s: number; b: number } => {
   return { h, s, b: v };
 }
 
+export type Mulberry32RngFn = () => number;
+function mulberry32(a: number): Mulberry32RngFn {
+  return function () {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 export default {
   lerp,
@@ -111,4 +120,5 @@ export default {
   randomRange,
   polyPointsAroundCircle,
   hexToHsb,
+  mulberry32,
 }

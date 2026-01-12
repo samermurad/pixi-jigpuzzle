@@ -245,11 +245,15 @@ export class PixiGame extends Component {
   // endregion
   // region API
   public async loadImg(): Promise<Texture> {
-    const res = await axios.get(`/api/public/imgs/random/${this.VIRTUAL_WIDTH}/${this.VIRTUAL_HEIGHT}`);
-    if (res.data == null) return await Assets.load(DefaultWallpaper);
-    // @ts-ignore
-    const { url } = res.data;
-    return await Assets.load({ src: url, format: 'jpeg' });
+    try {
+      const res = await axios.get(`/api/public/imgs/random/${this.VIRTUAL_WIDTH}/${this.VIRTUAL_HEIGHT}`);
+      if (res.data == null) return await Assets.load(DefaultWallpaper);
+      // @ts-ignore
+      const {url} = res.data;
+      return await Assets.load({src: url, format: 'jpeg'});
+    } catch (error) {
+      return await Assets.load(DefaultWallpaper);
+    }
   }
   // endregion
   // region Component Implementation

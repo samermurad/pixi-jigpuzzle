@@ -1,3 +1,10 @@
+@font-face {
+    font-family: AppDefault;
+    font-style: normal;
+    font-weight: 400;
+    /*src: local('Luckiest Guy RUS-BEL-UKR'), url('https://fonts.cdnfonts.com/s/69393/922font.woff') format('woff');*/
+    src: url("../assets/fonts/LuckiestGuy-Regular.ttf");
+}
 :root {
     --primary: #DB504A;
     --secondary: #FF6F59;
@@ -14,7 +21,8 @@
     height: 100dvh;
 }
 * {
-    font-family: 'Luckiest Guy RUS-BEL-UKR', sans-serif;
+    /*font-family: 'Luckiest Guy RUS-BEL-UKR', sans-serif;*/
+    font-family: AppDefault, sans-serif;
 }
 
 body {

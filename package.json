@@ -12,7 +12,10 @@
     "build:watch:server": "npm run watch -w src/server",
     "run:watch:server": "node --watch-path=./dist/ ./dist/server/index.js",
     "bundle:client": "webpack --config ./src/client/webpack.config.js",
-    "bundle:client:watch": "webpack --config ./src/client/webpack.config.js --watch"
+    "bundle:client:watch": "webpack --config ./src/client/webpack.config.js --watch",
+    "run:ts:script": "node  --import file:/Applications/WebStorm.app/Contents/plugins/nodeJS/js/ts-file-loader/node_modules/tsx/dist/loader.cjs",
+    "gen": "node  --import file:/Applications/WebStorm.app/Contents/plugins/nodeJS/js/ts-file-loader/node_modules/tsx/dist/loader.cjs ./scripts/gen.ts",
+    "gen2": "npm run run:ts:script ./scripts/gen.ts"
   },
   "dependencies": {
     "lodash": "^4.17.21"

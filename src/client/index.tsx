@@ -5,7 +5,7 @@ import App from './app/App';
 import { PixiApp } from './app/PixiApp';
 // import { Component } from './ui/Component';
 import { PixiGame } from './ui/components/PixiGame.component';
-import Game from './ui/pages/Game';
+import GamePage from './ui/pages/Game.page';
 
 class Main {
   root: HTMLDivElement;
